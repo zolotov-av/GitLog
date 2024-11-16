@@ -2,26 +2,6 @@
 #include <QPainter>
 #include <GitTools/GitLogModel.h>
 
-namespace
-{
-
-    inline int get_border(const QFontMetrics &fm)
-    {
-        return fm.lineWidth();
-    }
-
-    inline int get_spacing(const QFontMetrics &fm)
-    {
-        return fm.lineWidth() * 5 / 2;
-    }
-
-    inline int get_row_height(const QFontMetrics &fm)
-    {
-        return get_border(fm)*6 + fm.height();
-    }
-
-}
-
 GraphItem::GraphItem(QQuickItem *parent): QQuickPaintedItem{parent}
 {
     setAntialiasing(false);
@@ -79,12 +59,8 @@ void GraphItem::paint(QPainter *p)
     if ( !commit.isCommit() )
         return;
 
-    // Настраиваем шрифт и получаем его метрики
-    QFontMetrics fm(p->font());
-
-    const int rowHeight = get_row_height(fm);
-    const int spacing = get_spacing(fm);
-    //const int border = get_border(fm);
+    const int rowHeight = height();
+    const int spacing = QFontMetrics{p->font()}.lineWidth() * 5 / 2;
 
     const auto rect = boundingRect();
     //p->fillRect(rect, Qt::white);
@@ -98,7 +74,7 @@ void GraphItem::paint(QPainter *p)
     const auto half = rowHeight / 2;
     const auto xlane = commit.lane * rowHeight;
 
-    p->setPen(QPen{Qt::black, spacing * 2.0, Qt::SolidLine});
+    p->setPen(QPen{m_color, spacing * 2.0, Qt::SolidLine});
     for(int li = 0; li < commit.lanes.size(); li++)
     {
         auto lane = commit.lanes[li];
@@ -124,11 +100,7 @@ void GraphItem::paint(QPainter *p)
     }
 
     p->setPen(Qt::NoPen);
-    Qt::GlobalColor clr = Qt::black;
-    if ( commit.isTail() ) clr = Qt::blue;
-    else if ( commit.isRoot() ) clr = Qt::darkGreen;
-    else if ( commit.isMerge() || commit.isBranch() ) clr = Qt::red;
-    p->setBrush(clr);
+    p->setBrush(m_color);
 
     if ( commit.isMerge() )
     {
@@ -139,7 +111,7 @@ void GraphItem::paint(QPainter *p)
         p->drawEllipse(xlane + offset, offset, size, size);
     }
 
-    p->setPen(QPen{Qt::black, spacing * 2.0, Qt::SolidLine});
+    p->setPen(QPen{m_color, spacing * 2.0, Qt::SolidLine});
 
     if ( commit.down )
     {

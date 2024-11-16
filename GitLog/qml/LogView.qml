@@ -17,7 +17,7 @@ Rectangle {
 
         delegate: Item {
 
-            implicitHeight: txt.implicitHeight
+            implicitHeight: txt.implicitHeight * 1.2
             implicitWidth: logView.width
 
             RowLayout {
@@ -26,6 +26,7 @@ Rectangle {
                 GraphItem {
                     implicitWidth: 100
                     implicitHeight: txt.implicitHeight
+                    Layout.fillHeight: true
 
                     model: logView.model
                     time: commitTime
