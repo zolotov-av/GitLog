@@ -4,6 +4,7 @@
 #include <QVector>
 #include <GitTools/base.h>
 #include "CommitRefsModel.h"
+#include <QRegularExpression>
 
 namespace git
 {
@@ -94,7 +95,7 @@ namespace git
 
         QString shortMessage(int maxLen = 80) const
         {
-            return m_message.left(maxLen).split(QRegExp("(\\r|\\n)")).first();
+            return m_message.left(maxLen).split(QRegularExpression{"(\\r|\\n)"}).first();
         }
 
         const QString& author_name() const

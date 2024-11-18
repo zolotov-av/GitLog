@@ -131,7 +131,7 @@ public:
     {
         auto form = new ExceptionTooltip();
         form->setMessage(caption, message);
-        QPoint pos = parent->mapToGlobal({0, 0});
+        QPoint pos = parent->mapToGlobal(QPoint{0, 0});
         QRect rect;
         rect.setX(pos.x());
         rect.setY(pos.y());

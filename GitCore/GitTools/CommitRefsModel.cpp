@@ -22,6 +22,18 @@ CommitRefsModel::~CommitRefsModel()
 
 }
 
+CommitRefsModel& CommitRefsModel::operator = (const CommitRefsModel &other)
+{
+    m_refs = other.m_refs;
+    return *this;
+}
+
+CommitRefsModel& CommitRefsModel::operator = (CommitRefsModel &&other)
+{
+    m_refs = std::move(other.m_refs);
+    return *this;
+}
+
 int CommitRefsModel::rowCount(const QModelIndex &parent) const
 {
     return m_refs.size();

@@ -7,6 +7,7 @@
 
 #include <QDebug>
 #include <QDateTime>
+#include <QRegularExpression>
 
 namespace git
 {
@@ -336,14 +337,12 @@ namespace git
 
         string shortMessage(int maxLen = 80) const
         {
-            return message().left(maxLen).split(QRegExp("(\\r|\\n)")).first();
+            return message().left(maxLen).split(QRegularExpression{"(\\r|\\n)"}).first();
         }
 
         QDateTime dateTime() const
         {
-            QDateTime dateTime;
-            dateTime.setTime_t(git_commit_time(c));
-            return dateTime;
+            return QDateTime::fromSecsSinceEpoch(git_commit_time(c));
         }
 
         signature author() const

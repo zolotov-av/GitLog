@@ -2,8 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Window 2.15
-import Qt.labs.settings 1.0
-import Qt.labs.platform 1.0
+import Qt.labs.platform 1.1
 
 ApplicationWindow {
     id: window
@@ -67,7 +66,7 @@ ApplicationWindow {
     SystemTrayIcon {
         id: systemTray
         visible: true
-        iconSource: "qrc:/icons/folder-blue-git-icon.png"
+        icon.source: "qrc:/icons/folder-blue-git-icon.png"
         tooltip: window.title
 
         onActivated: {

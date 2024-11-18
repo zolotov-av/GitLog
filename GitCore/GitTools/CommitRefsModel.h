@@ -36,8 +36,8 @@ public:
     CommitRefsModel(CommitRefsModel &&other);
     ~CommitRefsModel();
 
-    CommitRefsModel& operator = (const CommitRefsModel &) = delete;
-    CommitRefsModel& operator = (CommitRefsModel &&) = delete;
+    CommitRefsModel& operator = (const CommitRefsModel &other);
+    CommitRefsModel& operator = (CommitRefsModel &&other);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent) const override;
