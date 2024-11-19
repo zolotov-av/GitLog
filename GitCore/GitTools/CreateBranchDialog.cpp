@@ -93,43 +93,10 @@ void CreateBranchDialog::on_pbOk_clicked()
     */
 }
 
-void CreateBranchDialog::setModel(GitLogModel *m)
-{
-    model = m;
-}
-
 void CreateBranchDialog::setRepositiory(git::repository *r)
 {
-    repo = r;
-    if ( repo == nullptr ) throw git::exception("setRepository(null)");
-
-    git_reference_iterator *iter;
-    int status = git_reference_iterator_new(&iter, repo->data());
-    if ( status == 0 )
-    {
-        git_reference *ref;
-
-        while ( true )
-        {
-            status = git_reference_next(&ref, iter);
-            if ( status != 0 )
-            {
-                break;
-            }
-            const git::reference r = ref;
-            if ( r.isBranch() )
-            {
-               // ui.cbBranch->addItem(r.shortName());
-            }
-            else if ( r.isTag() )
-            {
-               // ui.cbTag->addItem(r.shortName());
-            }
-        }
-
-        git_reference_iterator_free(iter);
-    }
-
+    m_branches.loadBranches(r);
+    m_tags.loadTags(r);
 }
 
 void CreateBranchDialog::setCommitId(const git::object_id &id)

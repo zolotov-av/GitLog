@@ -5,7 +5,7 @@
 #include <QColor>
 #include <GitTools/base.h>
 
-class CommitRefsModel final: public QAbstractItemModel
+class RefsModel final: public QAbstractItemModel
 {
     Q_OBJECT
 
@@ -31,13 +31,13 @@ private:
 
 public:
 
-    explicit CommitRefsModel(QObject *parent = nullptr);
-    CommitRefsModel(const CommitRefsModel &other);
-    CommitRefsModel(CommitRefsModel &&other);
-    ~CommitRefsModel();
+    explicit RefsModel(QObject *parent = nullptr);
+    RefsModel(const RefsModel &other);
+    RefsModel(RefsModel &&other);
+    ~RefsModel();
 
-    CommitRefsModel& operator = (const CommitRefsModel &other);
-    CommitRefsModel& operator = (CommitRefsModel &&other);
+    RefsModel& operator = (const RefsModel &other);
+    RefsModel& operator = (RefsModel &&other);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent) const override;
@@ -47,6 +47,10 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
+    void clear();
     void append(const git::reference_info &ref);
+
+    void loadBranches(git::repository *repo);
+    void loadTags(git::repository *repo);
 
 };

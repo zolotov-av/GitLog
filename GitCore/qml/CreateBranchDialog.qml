@@ -54,18 +54,18 @@ ApplicationWindow {
                     text: qsTr("Branch")
                     enabled: false
                 }
-                ComboBox {
+                RefsComboBox {
                     Layout.fillWidth: true
-
+                    model: form.branchesModel
                 }
 
                 RadioButton {
                     text: qsTr("Tag")
                     enabled: false
                 }
-                ComboBox {
+                RefsComboBox {
                     Layout.fillWidth: true
-
+                    model: form.tagsModel
                 }
 
                 RadioButton {

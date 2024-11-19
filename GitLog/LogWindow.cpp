@@ -226,7 +226,6 @@ void LogWindow::openCreateBrunchDialog(int commitIndex)
 
     const auto commit = m_log_model->commitInfoByIndex(currentCommitIndex());
 
-    createBrunchDialog->setModel(m_log_model);
     createBrunchDialog->setRepositiory(&repo);
     createBrunchDialog->setCommitId(commit.oid().toString());
     createBrunchDialog->show();

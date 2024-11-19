@@ -5,17 +5,20 @@
 #include <QDialog>
 #include <GitTools/base.h>
 #include <GitTools/GitLogModel.h>
+#include <GitTools/RefsModel.h>
 
 class CreateBranchDialog: public QuickDialog
 {
     Q_OBJECT
     Q_PROPERTY(QString commitHash READ commitHash NOTIFY commitChanged FINAL)
+    Q_PROPERTY(QAbstractItemModel* branchesModel READ branchesModel CONSTANT FINAL)
+    Q_PROPERTY(QAbstractItemModel* tagsModel READ tagsModel CONSTANT FINAL)
 
 private:
 
     git::object_id commit_id { };
-    git::repository *repo { nullptr };
-    GitLogModel *model { nullptr };
+    RefsModel m_branches { this };
+    RefsModel m_tags { this };
 
 public:
 
@@ -26,6 +29,9 @@ public:
 
     CreateBranchDialog& operator = (const CreateBranchDialog &) = delete;
     CreateBranchDialog& operator = (CreateBranchDialog &&) = delete;
+
+    QAbstractItemModel* branchesModel() { return &m_branches; }
+    QAbstractItemModel* tagsModel() { return &m_tags; }
 
 private:
 
@@ -39,7 +45,6 @@ public:
 
     QString commitHash() { return commit_id.toString(); }
 
-    void setModel(GitLogModel *m);
     void setRepositiory(git::repository *r);
     void setCommitId(const git::object_id &id);
 

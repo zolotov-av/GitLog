@@ -9,8 +9,8 @@ qt_standard_project_setup()
 add_library(GitCore STATIC
     GitTools/GitApplication.h
     GitTools/GitApplication.cpp
-    GitTools/CommitRefsModel.h
-    GitTools/CommitRefsModel.cpp
+    GitTools/RefsModel.h
+    GitTools/RefsModel.cpp
     GitTools/CommitInfo.h
     GitTools/QuickDialog.h
     GitTools/QuickDialog.cpp
@@ -38,6 +38,7 @@ qt_add_qml_module(GitCore
         qml/LineInput.qml
         qml/MultiLineInput.qml
         qml/DiffArea.qml
+        qml/RefsComboBox.qml
         qml/CreateBranchDialog.qml
         qml/DeleteBranchDialog.qml
     SOURCES
