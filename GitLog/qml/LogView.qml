@@ -34,6 +34,14 @@ Rectangle {
         }
 
         MenuItem {
+            text: qsTr("Create branch")
+            onTriggered: {
+                console.log("Create branch:", refContextMenu.commitIndex)
+                gitlog.openCreateBrunchDialog(refContextMenu.commitIndex)
+            }
+        }
+
+        MenuItem {
             text: qsTr("Delete branch")
             // Показывать только для веток
             //visible: refContextMenu.selectedRefName.startsWith("refs/heads/")
@@ -155,11 +163,21 @@ Rectangle {
             }
 
             MouseArea {
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
                 anchors.fill: parent
-                onClicked: {
+
+                onClicked: function(mouse) {
                     logView.currentIndex = index;
                     gitlog.showCommit(index);
                     logView.forceActiveFocus();
+
+                    if (mouse.button === Qt.RightButton) {
+                        refContextMenu.refsModel = null
+                        refContextMenu.selectedRefName = ""
+                        refContextMenu.commitIndex = index
+                        refContextMenu.popup()
+                    }
+
                 }
 
                 onDoubleClicked: {

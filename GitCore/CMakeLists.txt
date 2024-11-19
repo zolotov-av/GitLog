@@ -15,7 +15,7 @@ add_library(GitCore STATIC
     GitTools/QuickDialog.h
     GitTools/QuickDialog.cpp
     GitTools/CreateBranchDialog.h
-    GitTools/ExceptionTooltip.h
+    GitTools/CreateBranchDialog.cpp
     GitTools/GitCommitFiles.h
     GitTools/GitLogDelegate.h
     GitTools/GitLogModel.h
@@ -25,8 +25,6 @@ add_library(GitCore STATIC
     GitTools/GitCommitFiles.cpp
     GitTools/GitLogDelegate.cpp
     GitTools/GitLogModel.cpp
-    GitTools/CreateBranchDialog.ui
-    GitTools/ExceptionTooltip.ui
     GitTools/DiffModel.h
     GitTools/DiffModel.cpp
 )
@@ -40,6 +38,7 @@ qt_add_qml_module(GitCore
         qml/LineInput.qml
         qml/MultiLineInput.qml
         qml/DiffArea.qml
+        qml/CreateBranchDialog.qml
         qml/DeleteBranchDialog.qml
     SOURCES
         GraphItem.h

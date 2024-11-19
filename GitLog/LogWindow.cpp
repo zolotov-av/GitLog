@@ -11,6 +11,7 @@
 #include <QResizeEvent>
 #include <QQmlContext>
 #include <QQmlComponent>
+#include <QApplication>
 
 void LogWindow::openDiff(int index)
 {
@@ -58,6 +59,8 @@ LogWindow::LogWindow(QWidget *parent): QObject{parent}
     {
         qDebug().noquote() << "ERROR: m_qml_engine.rootObjects().isEmpty()";
     }
+
+    createBrunchDialog = new CreateBranchDialog{&m_qml_engine};
 
     commitDialog = new CommitDialog(&m_qml_engine);
     commitDialog->setAuthorName(cache->value("AuthorName").toString());
@@ -217,17 +220,16 @@ void LogWindow::showCommit(int index)
     }
 }
 
-void LogWindow::on_actionCreateBranch_triggered()
+void LogWindow::openCreateBrunchDialog(int commitIndex)
 {
-    qDebug() << "on_actionCreateBranch_triggered()";
+    qDebug().noquote() << "LogWindow::openCreateBrunchDialog(" << commitIndex << ")";
+
     const auto commit = m_log_model->commitInfoByIndex(currentCommitIndex());
 
-    auto dlg = new CreateBranchDialog(nullptr);
-    dlg->setModel(m_log_model);
-    dlg->setRepositiory(&repo);
-    dlg->setCommitId(commit.oid().toString());
-    dlg->show();
-
+    createBrunchDialog->setModel(m_log_model);
+    createBrunchDialog->setRepositiory(&repo);
+    createBrunchDialog->setCommitId(commit.oid().toString());
+    createBrunchDialog->show();
 }
 
 void LogWindow::openCommitDialog()

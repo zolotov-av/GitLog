@@ -29,6 +29,6 @@ public:
 
     Q_INVOKABLE void show();
     Q_INVOKABLE void hide();
-    Q_INVOKABLE void close();
+    Q_INVOKABLE void close();    
 
 };

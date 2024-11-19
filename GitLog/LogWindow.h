@@ -7,6 +7,7 @@
 #include <GitTools/base.h>
 #include <GitTools/DiffModel.h>
 #include <GitTools/GitLogModel.h>
+#include <GitTools/CreateBranchDialog.h>
 #include "CommitDialog.h"
 
 namespace Ui {
@@ -40,6 +41,7 @@ private:
     QString m_commit_message { "some text" };
     GitLogModel *m_log_model { nullptr };
     DiffModel m_diff_model { this };
+    CreateBranchDialog *createBrunchDialog { nullptr };
 
 public:
 
@@ -78,12 +80,12 @@ public slots:
     void showCommit(int index);
     void openDiff(int index);
     void closeDiff();
+    void openCreateBrunchDialog(int commitIndex);
     void openCommitDialog();
     void removeRef(const QString &refName);
 
 private slots:
 
-    void on_actionCreateBranch_triggered();
     void doCommit();
 
 private:
