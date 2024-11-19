@@ -4,6 +4,8 @@ project(GitCore VERSION 1.0 LANGUAGES CXX)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Quick)
 
+qt_standard_project_setup()
+
 add_library(GitCore STATIC
     GitTools/GitApplication.h
     GitTools/GitApplication.cpp
@@ -25,12 +27,24 @@ add_library(GitCore STATIC
     GitTools/CreateBranchDialog.ui
     GitTools/DeleteBranchDialog.ui
     GitTools/ExceptionTooltip.ui
-    GitTools/GraphItem.h
-    GitTools/GraphItem.cpp
     GitTools/DiffModel.h
     GitTools/DiffModel.cpp
-    GitCoreResources.qrc
     GitTools/QuickDialog.h GitTools/QuickDialog.cpp
+)
+
+qt_add_qml_module(GitCore
+    URI "GitCore"
+    VERSION 1.0
+    PLUGIN_TARGET GitCore_plugin
+    QML_FILES
+        qml/GitTheme.qml
+        qml/LineInput.qml
+        qml/MultiLineInput.qml
+        qml/DiffArea.qml
+    SOURCES
+        GraphItem.h
+        GraphItem.cpp
+    RESOURCE_PREFIX "/qt/qml"
 )
 
 set_target_properties(GitCore PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)

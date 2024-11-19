@@ -7,6 +7,7 @@
 class GraphItem: public QQuickPaintedItem
 {
     Q_OBJECT
+    QML_ELEMENT
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged FINAL)
     Q_PROPERTY(QAbstractItemModel* model READ model WRITE setModel NOTIFY modelChanged FINAL)
     Q_PROPERTY(int itemIndex READ index WRITE setIndex NOTIFY indexChanged FINAL)

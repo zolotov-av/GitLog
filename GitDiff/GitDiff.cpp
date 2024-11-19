@@ -16,18 +16,24 @@ static QByteArray loadFromFile(const QString &filePath)
     return file.readAll();
 }
 
-GitDiff::GitDiff(QWindow *parent): QQuickView{parent}
+GitDiff::GitDiff(QObject *parent): QQmlApplicationEngine{parent}
 {
-    setTitle(tr("Git Diff"));
-    setResizeMode(QQuickView::SizeRootObjectToView);
-    resize(QSize{1200, 800});
+    constexpr auto pathQtQml = "qrc:/qt/qml";
+    if ( !importPathList().contains(pathQtQml) )
+    {
+        // Отладочная информация
+        qWarning() << "Import paths:" << importPathList();
+        qWarning() << "Add path: " << pathQtQml;
+        addImportPath(pathQtQml);
+        qWarning() << "New import paths:" << importPathList();
+    }
 
     diffFiles(":/tmp/left.txt", ":/tmp/right.txt");
 
     rootContext()->setContextProperty("lineView", this);
     rootContext()->setContextProperty("diff", this);
 
-    setSource(QUrl{"qrc:/qml/GitDiff.qml"});
+    load(QUrl{"qrc:/qml/GitDiff.qml"});
 }
 
 GitDiff::~GitDiff()

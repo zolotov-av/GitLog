@@ -28,6 +28,16 @@ void LogWindow::closeDiff()
 
 LogWindow::LogWindow(QWidget *parent): QObject{parent}
 {
+    constexpr auto pathQtQml = "qrc:/qt/qml";
+    if ( !m_qml_engine.importPathList().contains(pathQtQml) )
+    {
+        // Отладочная информация
+        qWarning() << "Import paths:" << m_qml_engine.importPathList();
+        qWarning() << "Add path: " << pathQtQml;
+        m_qml_engine.addImportPath(pathQtQml);
+        qWarning() << "New import paths:" << m_qml_engine.importPathList();
+    }
+
     cache = new QSettings(QString("%1/.cache/GitTools/GitLog.ini").arg(QDir::homePath()), QSettings::IniFormat, this);
     qDebug() << cache->fileName();
 

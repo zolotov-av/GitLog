@@ -1,13 +1,13 @@
 #pragma once
 
-#include <QQuickView>
+#include <QQmlApplicationEngine>
 #include <GitTools/base.h>
 #include <GitTools/DiffModel.h>
 
 /**
  * @brief Окно GitDiff
  */
-class GitDiff: public QQuickView
+class GitDiff: public QQmlApplicationEngine
 {
     Q_OBJECT
     Q_PROPERTY(QString oldFileName READ oldFileName NOTIFY diffChanged FINAL)
@@ -22,7 +22,7 @@ private:
 
 public:
 
-    explicit GitDiff(QWindow *parent = nullptr);
+    explicit GitDiff(QObject *parent = nullptr);
     GitDiff(const GitDiff &) = delete;
     GitDiff(GitDiff &&) = delete;
     ~GitDiff();

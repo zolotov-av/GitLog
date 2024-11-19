@@ -3,6 +3,5 @@
         <file>qml/GitDiff.qml</file>
         <file>tmp/left.txt</file>
         <file>tmp/right.txt</file>
-        <file>qml/GitDiffArea.qml</file>
     </qresource>
 </RCC>

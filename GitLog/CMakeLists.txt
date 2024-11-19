@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.16)
 
 project(GitLog VERSION 1.0 LANGUAGES CXX)
 
-find_package(Qt6 REQUIRED COMPONENTS DBus Quick QuickControls2 QuickWidgets)
+find_package(Qt6 REQUIRED COMPONENTS DBus Quick Gui)
+
+qt_standard_project_setup(REQUIRES 6.4)
 
 add_executable(GitLog
     DBusInterface.h
@@ -25,5 +27,5 @@ set_target_properties(GitLog PROPERTIES AUTOMOC ON)
 set_target_properties(GitLog PROPERTIES AUTORCC ON)
 set_target_properties(GitLog PROPERTIES AUTOUIC ON)
 
-target_link_libraries(GitLog PRIVATE GitCore)
-target_link_libraries(GitLog PRIVATE Qt6::DBus Qt6::Quick Qt6::QuickWidgets)
+target_link_libraries(GitLog PRIVATE GitCore GitCore_plugin)
+target_link_libraries(GitLog PRIVATE Qt6::DBus Qt6::Quick Qt6::Gui)

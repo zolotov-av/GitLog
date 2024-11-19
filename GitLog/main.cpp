@@ -1,8 +1,11 @@
+#include <QApplication>
+#include <QQmlApplicationEngine>
+#include <QQmlEngineExtensionPlugin>
 #include "LogWindow.h"
 #include "DBusInterface.h"
-#include <QApplication>
 #include <GitTools/GitApplication.h>
-#include <GitTools/GraphItem.h>
+
+Q_IMPORT_QML_PLUGIN(GitCorePlugin)
 
 using namespace git;
 
@@ -19,16 +22,6 @@ int main(int argc, char *argv[])
         dbus.showGitLog();
         return 0;
     }
-
-    constexpr auto GitToolsModName = "GitTools";
-    constexpr int GitToolsVerMajor = 1;
-    constexpr int GitToolsVerMinor = 0;
-    // @uri GitTools
-    qmlRegisterModule(GitToolsModName, GitToolsVerMajor, GitToolsVerMinor);
-    qmlRegisterType<GraphItem>(GitToolsModName, GitToolsVerMajor, GitToolsVerMinor, "GraphItem");
-    qmlRegisterType(QUrl{"qrc:/qml/LineInput.qml"}, GitToolsModName, GitToolsVerMajor, GitToolsVerMinor, "LineInput");
-    qmlRegisterType(QUrl{"qrc:/qml/MultiLineInput.qml"}, GitToolsModName, GitToolsVerMajor, GitToolsVerMinor, "MultiLineInput");
-    qmlRegisterSingletonType(QUrl{"qrc:/qml/GitTheme.qml"}, GitToolsModName, GitToolsVerMajor, GitToolsVerMinor, "GitTheme");
 
     LogWindow w;
 

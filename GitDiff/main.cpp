@@ -1,7 +1,11 @@
 #include <QApplication>
+#include <QQmlApplicationEngine>
+#include <QQmlEngineExtensionPlugin>
 #include <GitTools/GitApplication.h>
 #include <git2.h>
 #include "GitDiff.h"
+
+Q_IMPORT_QML_PLUGIN(GitCorePlugin)
 
 int main(int argc, char *argv[])
 {
@@ -9,7 +13,6 @@ int main(int argc, char *argv[])
     GitApplication gitApp;
 
     GitDiff view;
-    view.show();
 
     return a.exec();
 }

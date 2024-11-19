@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.16)
 
 project(GitDiff VERSION 1.0 LANGUAGES CXX)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick QuickControls2)
+find_package(Qt6 REQUIRED COMPONENTS Quick Gui)
+
+qt_standard_project_setup(REQUIRES 6.4)
 
 add_executable(GitDiff
     GitDiff.h
@@ -19,5 +21,5 @@ set_target_properties(GitDiff PROPERTIES AUTOMOC ON)
 set_target_properties(GitDiff PROPERTIES AUTORCC ON)
 set_target_properties(GitDiff PROPERTIES AUTOUIC OFF)
 
-target_link_libraries(GitDiff PRIVATE GitCore)
-target_link_libraries(GitDiff PRIVATE Qt6::Core Qt6::Gui Qt6::Quick Qt6::QuickControls2)
+target_link_libraries(GitDiff PRIVATE Qt6::Quick Qt6::Gui)
+target_link_libraries(GitDiff PRIVATE GitCore GitCore_plugin)

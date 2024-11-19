@@ -1,7 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>qml/GitTheme.qml</file>
-        <file>qml/LineInput.qml</file>
-        <file>qml/MultiLineInput.qml</file>
-    </qresource>
-</RCC>

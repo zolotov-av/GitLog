@@ -1,9 +1,14 @@
-import QtQuick 2.15
-import QtQuick.Layouts 1.0
-import QtQuick.Controls 2.15
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
+import GitCore
 
-Item {
+ApplicationWindow {
     id: root
+    visible: true
+    title: qsTr("Git Diff")
+    width: 1200
+    height: 800
     property alias headerVisible: header.visible
     property int fontSize: 18
     property string fontFamily: "Monospace"
@@ -44,7 +49,7 @@ Item {
             }
         }
 
-        GitDiffArea {
+        DiffArea {
             id: rightView
             fontFamily: root.fontFamily
             fontSize: root.fontSize
