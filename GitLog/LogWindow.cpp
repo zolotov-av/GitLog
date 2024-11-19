@@ -4,7 +4,6 @@
 #include <GitTools/GitCommitFiles.h>
 #include <GitTools/GitLogDelegate.h>
 #include <GitTools/CreateBranchDialog.h>
-#include <GitTools/DeleteBranchDialog.h>
 
 #include <QMenu>
 #include <QDebug>
@@ -231,18 +230,6 @@ void LogWindow::on_actionCreateBranch_triggered()
 
 }
 
-void LogWindow::on_actionDeleteBranch_triggered()
-{
-    qDebug() << "on_actionDeleteBranch_triggered()";
-    const auto commit = m_log_model->commitInfoByIndex(currentCommitIndex());
-
-    auto dlg = new git::DeleteBranchDialog(nullptr);
-    dlg->setModel(m_log_model);
-    dlg->setCommitId(&repo, commit.oid().toString());
-    dlg->show();
-
-}
-
 void LogWindow::openCommitDialog()
 {
     /*
@@ -268,6 +255,22 @@ void LogWindow::openCommitDialog()
     }
     commitDialog->setFiles(&repo);
     commitDialog->exec();
+}
+
+void LogWindow::removeRef(const QString &refName)
+{
+    qDebug().noquote() << "LogWindow::removeRef(" << refName << ")";
+
+    auto branch = repo.get_branch(refName);
+    if ( !branch.isBranch() )
+    {
+        qDebug().noquote() << refName << "is not branch, skip";
+        return;
+    }
+
+    repo.delete_branch(std::move(branch));
+
+    update();
 }
 
 void LogWindow::doCommit()

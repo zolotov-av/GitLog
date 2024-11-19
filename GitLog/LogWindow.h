@@ -79,11 +79,11 @@ public slots:
     void openDiff(int index);
     void closeDiff();
     void openCommitDialog();
+    void removeRef(const QString &refName);
 
 private slots:
 
     void on_actionCreateBranch_triggered();
-    void on_actionDeleteBranch_triggered();
     void doCommit();
 
 private:

@@ -9,6 +9,44 @@ Rectangle {
 
     property alias currentIndex: logView.currentIndex
 
+    DeleteBranchDialog {
+        id: confirmDialog
+
+        onConfirmed: function(branchName) {
+            gitlog.removeRef(branchName)
+        }
+    }
+
+    Menu {
+        id: refContextMenu
+
+        property string selectedRefName: ""
+        property int commitIndex: -1
+        property var refsModel: null
+
+        MenuItem {
+            text: qsTr("Checkout branch")
+            //visible: refContextMenu.selectedRefName.startsWith("refs/heads/")
+            onTriggered: {
+                // Логика переключения на ветку
+                console.log("Checkout branch:", refContextMenu.selectedRefName)
+            }
+        }
+
+        MenuItem {
+            text: qsTr("Delete branch")
+            // Показывать только для веток
+            //visible: refContextMenu.selectedRefName.startsWith("refs/heads/")
+            onTriggered: {
+                confirmDialog.model = refContextMenu.refsModel
+                confirmDialog.setCurrentBranch(refContextMenu.selectedRefName)
+                console.log("refsModel: " + refContextMenu.refsModel.rowCount())
+                confirmDialog.open()
+            }
+        }
+
+    }
+
     ListView {
         id: logView
         model: gitlog.logModel
@@ -62,6 +100,30 @@ Rectangle {
                                     font.family: root.fontFamily
                                     font.pixelSize: root.fontSize - 4
                                     anchors.centerIn: parent
+                                }
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton  // Принимаем обе кнопки
+
+                                onClicked: function(mouse) {
+                                    if (mouse.button === Qt.RightButton) {
+                                        // Установим данные для контекстного меню
+                                        refContextMenu.refsModel = commitRefs
+                                        refContextMenu.selectedRefName = refName
+                                        refContextMenu.commitIndex = index
+                                        // Показываем меню в позиции клика
+                                        refContextMenu.popup()
+                                    }
+                                }
+
+                                // Предотвращаем распространение события к внешнему MouseArea
+                                onPressed: function(mouse) {
+                                    mouse.accepted = true
+                                }
+                                onReleased: function(mouse) {
+                                    mouse.accepted = true
                                 }
                             }
 
