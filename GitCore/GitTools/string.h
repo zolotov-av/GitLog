@@ -1,8 +1,6 @@
-#ifndef GT_STRING_H
-#define GT_STRING_H
+#pragma once
 
-#include <QString>
-#include <string>
+#include <awCore/string.h>
 
 namespace git
 {
@@ -77,5 +75,3 @@ namespace git
     }
 
 }
-
-#endif // GT_STRING_H

@@ -5,6 +5,8 @@ project(GitTools VERSION 1.0 LANGUAGES C CXX)
 find_package(Qt6 REQUIRED COMPONENTS Quick Gui)
 find_package(Doxygen REQUIRED)
 
+include_directories(AFTER SYSTEM libs)
+
 qt_standard_project_setup()
 
 add_custom_target(GitToolsInfo SOURCES
@@ -12,6 +14,7 @@ add_custom_target(GitToolsInfo SOURCES
     mainpage.dox
 )
 
+add_subdirectory(libs/awCore)
 add_subdirectory(GitCore)
 add_subdirectory(GitLog)
 add_subdirectory(GitDiff)

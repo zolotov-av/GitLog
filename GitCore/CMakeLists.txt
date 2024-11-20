@@ -58,5 +58,5 @@ set_target_properties(GitCore PROPERTIES AUTOUIC ON)
 target_include_directories(GitCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(GitCore PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/GitCore_autogen/include)
 
-target_link_libraries(GitCore PUBLIC Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Quick)
+target_link_libraries(GitCore PUBLIC Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Quick aw::Core)
 target_link_libraries(GitCore PUBLIC -lgit2)
