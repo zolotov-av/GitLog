@@ -49,7 +49,7 @@ set_target_properties(GitCore PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 set_target_properties(GitCore PROPERTIES AUTOMOC ON)
 set_target_properties(GitCore PROPERTIES AUTORCC ON)
-set_target_properties(GitCore PROPERTIES AUTOUIC ON)
+set_target_properties(GitCore PROPERTIES AUTOUIC OFF)
 
 target_include_directories(GitCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(GitCore PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/GitCore_autogen/include)

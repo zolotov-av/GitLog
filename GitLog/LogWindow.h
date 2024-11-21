@@ -9,10 +9,6 @@
 #include <GitTools/CreateBranchDialog.h>
 #include "CommitDialog.h"
 
-namespace Ui {
-class LogWindow;
-}
-
 class GitLogView;
 class GitLogModel;
 class GitCommitFiles;

@@ -11,7 +11,6 @@ add_executable(GitLog
     DBusInterface.cpp
     CommitDialog.h
     CommitDialog.cpp
-    LogWindow.ui
     LogWindow.h
     LogWindow.cpp
     main.cpp
@@ -25,7 +24,7 @@ set_target_properties(GitLog PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 set_target_properties(GitLog PROPERTIES AUTOMOC ON)
 set_target_properties(GitLog PROPERTIES AUTORCC ON)
-set_target_properties(GitLog PROPERTIES AUTOUIC ON)
+set_target_properties(GitLog PROPERTIES AUTOUIC OFF)
 
 target_link_libraries(GitLog PRIVATE GitCore GitCore_plugin)
 target_link_libraries(GitLog PRIVATE Qt6::DBus Qt6::Quick Qt6::Gui)
