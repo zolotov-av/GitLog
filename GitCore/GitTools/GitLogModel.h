@@ -2,7 +2,6 @@
 #define GT_GITLOG_MODEL_H
 
 #include <QAbstractItemModel>
-#include <GitTools/base.h>
 #include <GitTools/CommitInfo.h>
 
 class GitLogModel final: public QAbstractItemModel

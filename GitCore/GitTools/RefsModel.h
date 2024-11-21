@@ -3,7 +3,8 @@
 #include <QAbstractItemModel>
 #include <QList>
 #include <QColor>
-#include <GitTools/base.h>
+#include <GitTools/reference_info.h>
+#include <gitcxx/repository.h>
 
 class RefsModel final: public QAbstractItemModel
 {

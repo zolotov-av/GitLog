@@ -129,15 +129,15 @@ bool GitLogModel::open(const git::reference &reference)
 
     updateRefs();
 
-    git::revwalk revwalk = repo->new_revwalk();
-    revwalk.push(reference.name());
+    git::revwalk revwalk = repo->newRevwalk();
+    revwalk.pushRef(reference.name());
     history.clear();
     history.append(git::CommitType::index);
     history.append(git::CommitType::worktree);
     git_oid commit_id;
     while ( revwalk.next(commit_id) )
     {
-        auto commit = repo->get_commit(&commit_id);
+        auto commit = repo->lookupCommit(&commit_id);
         history.append(commit);
     }
 
@@ -155,16 +155,16 @@ bool GitLogModel::openAllRefs()
 
     updateRefs();
 
-    git::revwalk revwalk = repo->new_revwalk();
+    git::revwalk revwalk = repo->newRevwalk();
     revwalk.setSorting(GIT_SORT_TOPOLOGICAL);
-    revwalk.push("HEAD");
+    revwalk.pushRef("HEAD");
     for(const auto &ref : refs())
     {
         try
         {
-            revwalk.push(ref.name);
+            revwalk.pushRef(ref.name);
         }
-        catch (const git::exception &e)
+        catch (const std::exception &e)
         {
             qDebug() << "revwalk.push() exception: " << e.what();
         }
@@ -176,7 +176,7 @@ bool GitLogModel::openAllRefs()
     git_oid commit_id;
     while ( revwalk.next(commit_id) )
     {
-        auto commit = repo->get_commit(&commit_id);
+        auto commit = repo->lookupCommit(&commit_id);
         history.append(commit);
     }
 

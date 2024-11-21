@@ -2,7 +2,6 @@
 #define GT_COMMIT_INFO_H
 
 #include <QVector>
-#include <GitTools/base.h>
 #include "RefsModel.h"
 #include <QRegularExpression>
 
@@ -79,7 +78,7 @@ namespace git
             m_oid(commit.id()),
             m_message(commit.message()),
             m_author_name(commit.author().name()),
-            m_commit_time(commit.dateTime()),
+            m_commit_time(commit.commitTime()),
             parents(commit.parentCount())
         {
             for(unsigned i = 0; i < commit.parentCount(); i++)

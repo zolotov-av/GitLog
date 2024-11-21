@@ -3,7 +3,7 @@
 
 #include <QAbstractItemModel>
 #include <QVector>
-#include <GitTools/base.h>
+#include <gitcxx/repository.h>
 
 class GitCommitFiles : public QAbstractItemModel
 {
@@ -32,7 +32,7 @@ public:
     void open_cached(git::repository *repo);
     void open_worktree(git::repository *repo);
     bool isWorktree() const { return m_worktree; }
-    git::delta getDelta(int index);
+    git::diff_delta getDelta(int index);
     void close();
 
 protected:

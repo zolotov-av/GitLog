@@ -187,10 +187,10 @@ void GitCommitFiles::open(git::repository *repo, const git::object_id &commit_oi
 {
     this->beginResetModel();
     m_worktree = false;
-    this->commit = repo->get_commit(commit_oid);
+    this->commit = repo->lookupCommit(commit_oid);
     if ( commit.parentCount() > 0 )
     {
-        this->diff = repo->diff(repo->get_commit(commit.parentId(0)), commit);
+        this->diff = repo->diff(repo->lookupCommit(commit.parentId(0)), commit);
         this->repo = repo;
         active = true;
     }
@@ -208,7 +208,7 @@ void GitCommitFiles::open_cached(git::repository *repo)
 {
     beginResetModel();
     m_worktree = false;
-    commit = repo->get_commit(repo->get_head().target());
+    commit = repo->lookupCommit(repo->head().target());
     diff = repo->diff_cached(commit);
     this->repo = repo;
     active = true;
@@ -226,7 +226,7 @@ void GitCommitFiles::open_worktree(git::repository *repo)
     endResetModel();
 }
 
-git::delta GitCommitFiles::getDelta(int index)
+git::diff_delta GitCommitFiles::getDelta(int index)
 {
     return diff.get_delta(index);
 }

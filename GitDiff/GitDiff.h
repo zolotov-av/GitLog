@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QQmlApplicationEngine>
-#include <GitTools/base.h>
 #include <GitTools/DiffModel.h>
 
 /**

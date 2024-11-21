@@ -15,6 +15,7 @@ add_custom_target(GitToolsInfo SOURCES
 )
 
 add_subdirectory(libs/awCore)
+add_subdirectory(libs/gitcxx)
 add_subdirectory(GitCore)
 add_subdirectory(GitLog)
 add_subdirectory(GitDiff)

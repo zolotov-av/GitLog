@@ -2,7 +2,6 @@
 
 #include <GitTools/GitLogModel.h>
 #include <GitTools/GitCommitFiles.h>
-#include <GitTools/GitLogDelegate.h>
 #include <GitTools/CreateBranchDialog.h>
 
 #include <QMenu>
@@ -150,7 +149,7 @@ void LogWindow::refresh(bool checked)
         }
         else
         {
-            m_log_model->open(repo.get_head());
+            m_log_model->open(repo.head());
         }
     }
 }
@@ -227,7 +226,7 @@ void LogWindow::openCreateBrunchDialog(int commitIndex)
     const auto commit = m_log_model->commitInfoByIndex(currentCommitIndex());
 
     createBrunchDialog->setRepositiory(&repo);
-    createBrunchDialog->setCommitId(commit.oid().toString());
+    createBrunchDialog->setCommitId(commit.oid());
     createBrunchDialog->show();
 }
 
@@ -250,7 +249,7 @@ void LogWindow::openCommitDialog()
     //return nullptr;
     */
     {
-        git::config cfg { repo.r };
+        git::config cfg = repo.getConfig();
         commitDialog->setAuthorName(cfg.getString("user.name"));
         commitDialog->setAuthorEmail(cfg.getString("user.email"));
     }
@@ -262,14 +261,14 @@ void LogWindow::removeRef(const QString &refName)
 {
     qDebug().noquote() << "LogWindow::removeRef(" << refName << ")";
 
-    auto branch = repo.get_branch(refName);
+    auto branch = repo.lookupBranch(refName);
     if ( !branch.isBranch() )
     {
         qDebug().noquote() << refName << "is not branch, skip";
         return;
     }
 
-    repo.delete_branch(std::move(branch));
+    repo.deleteBranch(std::move(branch));
 
     update();
 }
@@ -278,7 +277,7 @@ void LogWindow::doCommit()
 {
     const auto authorName = commitDialog->authorName();
     const auto authorEmail = commitDialog->authorEmail();
-    repo.make_commit(authorName, authorEmail, commitDialog->message());
+    repo.createCommit(authorName, authorEmail, commitDialog->message());
     cache->setValue("AuthorName", authorName);
     cache->setValue("AuthorEmail", authorEmail);
     commitDialog->clearMessage();

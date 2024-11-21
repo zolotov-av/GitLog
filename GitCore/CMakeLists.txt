@@ -17,13 +17,9 @@ add_library(GitCore STATIC
     GitTools/CreateBranchDialog.h
     GitTools/CreateBranchDialog.cpp
     GitTools/GitCommitFiles.h
-    GitTools/GitLogDelegate.h
     GitTools/GitLogModel.h
-    GitTools/base.h
-    GitTools/string.h
-    GitTools/exception.h
+    GitTools/reference_info.h
     GitTools/GitCommitFiles.cpp
-    GitTools/GitLogDelegate.cpp
     GitTools/GitLogModel.cpp
     GitTools/DiffModel.h
     GitTools/DiffModel.cpp
@@ -59,4 +55,4 @@ target_include_directories(GitCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(GitCore PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/GitCore_autogen/include)
 
 target_link_libraries(GitCore PUBLIC Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Quick aw::Core)
-target_link_libraries(GitCore PUBLIC -lgit2)
+target_link_libraries(GitCore PUBLIC gitcxx)

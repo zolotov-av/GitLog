@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QSettings>
 #include <QSystemTrayIcon>
-#include <GitTools/base.h>
 #include <GitTools/DiffModel.h>
 #include <GitTools/GitLogModel.h>
 #include <GitTools/CreateBranchDialog.h>
@@ -17,7 +16,6 @@ class LogWindow;
 class GitLogView;
 class GitLogModel;
 class GitCommitFiles;
-class GitLogDelegate;
 
 class LogWindow: public QObject
 {

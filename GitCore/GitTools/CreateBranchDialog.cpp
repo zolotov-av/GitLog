@@ -1,5 +1,6 @@
 #include "CreateBranchDialog.h"
 #include <QQmlContext>
+#include <awCore/exception.h>
 
 CreateBranchDialog::CreateBranchDialog(QQmlEngine *engine): QuickDialog{engine}
 {
@@ -51,7 +52,7 @@ git::commit CreateBranchDialog::lookup_target()
     }
     */
 
-    throw git::exception("nothing selected");
+    throw aw::exception("nothing selected");
 
 }
 

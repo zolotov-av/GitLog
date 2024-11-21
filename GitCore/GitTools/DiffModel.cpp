@@ -5,7 +5,6 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QDir>
-#include <GitTools/base.h>
 
 namespace
 {
@@ -313,7 +312,10 @@ void DiffModel::setDiff(const QByteArray &left, const QByteArray &right)
     const auto ret = git_diff_buffers(left.constData(), left.size(), nullptr,
                                       right.constData(), right.size(), nullptr,
                                       nullptr, nullptr, nullptr, &hunk_cb, &line_cb, &payload);
+    if ( ret != 0 )
+    {
 
+    }
 
     if ( ret == 0 )
     {
@@ -339,8 +341,8 @@ void DiffModel::setDiff(const QByteArray &left, const QByteArray &right)
     }
     else
     {
+        m_text = git::lastGitError();
         m_items.clear();
-        m_text = git::errorString(ret);
     }
 
     endResetModel();
@@ -351,13 +353,13 @@ static QByteArray getData(git::repository *repo, const git::object_id &oid)
     if ( oid.isNull() )
         return { };
 
-    const auto blob = repo->get_blob(oid.data());
-    QByteArray data = blob.rawcontent();
+    const auto blob = repo->lookupBlob(oid.data());
+    QByteArray data = blob.rawContent();
     data.detach();
     return data;
 }
 
-void DiffModel::setGitDelta(git::repository *repo, git::delta delta, bool isWorktree)
+void DiffModel::setGitDelta(git::repository *repo, git::diff_delta delta, bool isWorktree)
 {
     switch (delta.type())
     {
