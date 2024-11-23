@@ -1,4 +1,4 @@
-#include <QApplication>
+#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlEngineExtensionPlugin>
 #include "LogWindow.h"
@@ -11,7 +11,7 @@ using namespace git;
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QGuiApplication a(argc, argv);
     GitApplication gitApp;
 
     DBusInterface dbus;

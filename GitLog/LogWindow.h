@@ -1,9 +1,7 @@
 #pragma once
 
 #include <QQmlApplicationEngine>
-#include <QMainWindow>
 #include <QSettings>
-#include <QSystemTrayIcon>
 #include <GitTools/DiffModel.h>
 #include <GitTools/GitLogModel.h>
 #include <GitTools/CreateBranchDialog.h>
@@ -39,7 +37,7 @@ private:
 
 public:
 
-    explicit LogWindow(QWidget *parent = 0);
+    explicit LogWindow(QObject *parent = 0);
     LogWindow(const LogWindow &) = delete;
     LogWindow(LogWindow &&) = delete;
     ~LogWindow();

@@ -2,7 +2,6 @@
 
 #include "QuickDialog.h"
 #include <QQmlEngine>
-#include <QDialog>
 #include <GitTools/GitLogModel.h>
 #include <GitTools/RefsModel.h>
 

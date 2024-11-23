@@ -2,9 +2,9 @@
 #include <QFile>
 #include <QBuffer>
 #include <QTextStream>
-#include <QMessageBox>
 #include <QDebug>
 #include <QDir>
+#include <awCore/trace.h>
 
 namespace
 {
@@ -60,7 +60,7 @@ namespace
         }
         else
         {
-            QMessageBox::warning(nullptr, "Error", "Could not open file: " + file.errorString());
+            aw::trace::log("Could not open file: " + file.errorString());
         }
 
         return items;
@@ -213,7 +213,7 @@ void DiffModel::loadFromFile(const QString &path)
     }
     else
     {
-        QMessageBox::warning(nullptr, "Error", "Could not open file: " + path + "\nError: " + file.errorString());
+        aw::trace::log("Could not open file: %s", file.errorString());
     }
 
     file.close();
@@ -253,7 +253,7 @@ void DiffModel::setContent(const QByteArray &data)
     }
     else
     {
-        QMessageBox::warning(nullptr, "Error", "Could not open file: " + file.errorString());
+        aw::trace::log("Could not open file: %s" + file.errorString());
     }
 
     endResetModel();

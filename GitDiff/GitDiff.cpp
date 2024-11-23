@@ -1,15 +1,15 @@
 #include "GitDiff.h"
 #include <QQmlContext>
-#include <QMessageBox>
 #include <QDir>
 #include <QFile>
+#include <awCore/trace.h>
 
 static QByteArray loadFromFile(const QString &filePath)
 {
     QFile file{filePath};
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        QMessageBox::warning(nullptr, "Error", "Could not open file: " + filePath + "\nError: " + file.errorString());
+        aw::trace::log("Could not open file: %s", file.errorString());
         return { };
     }
 

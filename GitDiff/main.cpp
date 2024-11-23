@@ -1,4 +1,4 @@
-#include <QApplication>
+#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlEngineExtensionPlugin>
 #include <GitTools/GitApplication.h>
@@ -9,7 +9,7 @@ Q_IMPORT_QML_PLUGIN(GitCorePlugin)
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QGuiApplication a(argc, argv);
     GitApplication gitApp;
 
     GitDiff view;

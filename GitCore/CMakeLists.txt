@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(GitCore VERSION 1.0 LANGUAGES CXX)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Quick)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick)
 
 qt_standard_project_setup()
 
@@ -54,5 +54,5 @@ set_target_properties(GitCore PROPERTIES AUTOUIC OFF)
 target_include_directories(GitCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(GitCore PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/GitCore_autogen/include)
 
-target_link_libraries(GitCore PUBLIC Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Quick aw::Core)
+target_link_libraries(GitCore PUBLIC Qt6::Core Qt6::Gui Qt6::Quick aw::Core)
 target_link_libraries(GitCore PUBLIC gitcxx)

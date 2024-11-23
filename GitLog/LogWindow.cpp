@@ -4,13 +4,12 @@
 #include <GitTools/GitCommitFiles.h>
 #include <GitTools/CreateBranchDialog.h>
 
-#include <QMenu>
 #include <QDebug>
 #include <QDir>
 #include <QResizeEvent>
 #include <QQmlContext>
 #include <QQmlComponent>
-#include <QApplication>
+#include <QGuiApplication>
 
 void LogWindow::openDiff(int index)
 {
@@ -25,7 +24,7 @@ void LogWindow::closeDiff()
     m_diff_model.clear();
 }
 
-LogWindow::LogWindow(QWidget *parent): QObject{parent}
+LogWindow::LogWindow(QObject *parent): QObject{parent}
 {
     constexpr auto pathQtQml = "qrc:/qt/qml";
     if ( !m_qml_engine.importPathList().contains(pathQtQml) )
