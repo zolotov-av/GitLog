@@ -6,12 +6,14 @@
 /**
  * @brief Окно GitDiff
  */
-class GitDiff: public QQmlApplicationEngine
+class GitDiff: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString oldFileName READ oldFileName NOTIFY diffChanged FINAL)
     Q_PROPERTY(QString newFileName READ newFileName NOTIFY diffChanged FINAL)
     Q_PROPERTY(QAbstractItemModel* lineModel READ lineModel CONSTANT FINAL)
+    QML_ELEMENT
+    QML_SINGLETON
 
 private:
 
@@ -48,7 +50,7 @@ public:
      * @param oldFile путь к старому файлу
      * @param newFile путь к новому файлу
      */
-    void diffFiles(const QString &oldFile, const QString &newFile);
+    Q_INVOKABLE void diffFiles(const QString &oldFile, const QString &newFile);
 
 signals:
 

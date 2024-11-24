@@ -1,7 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>qml/GitDiff.qml</file>
-        <file>tmp/left.txt</file>
-        <file>tmp/right.txt</file>
-    </qresource>
-</RCC>

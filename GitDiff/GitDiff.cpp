@@ -1,6 +1,4 @@
 #include "GitDiff.h"
-#include <QQmlContext>
-#include <QDir>
 #include <QFile>
 #include <awCore/trace.h>
 
@@ -16,29 +14,14 @@ static QByteArray loadFromFile(const QString &filePath)
     return file.readAll();
 }
 
-GitDiff::GitDiff(QObject *parent): QQmlApplicationEngine{parent}
+GitDiff::GitDiff(QObject *parent): QObject{parent}
 {
-    constexpr auto pathQtQml = "qrc:/qt/qml";
-    if ( !importPathList().contains(pathQtQml) )
-    {
-        // Отладочная информация
-        qWarning() << "Import paths:" << importPathList();
-        qWarning() << "Add path: " << pathQtQml;
-        addImportPath(pathQtQml);
-        qWarning() << "New import paths:" << importPathList();
-    }
-
-    diffFiles(":/tmp/left.txt", ":/tmp/right.txt");
-
-    rootContext()->setContextProperty("lineView", this);
-    rootContext()->setContextProperty("diff", this);
-
-    load(QUrl{"qrc:/qml/GitDiff.qml"});
+    aw::trace::log("GitDiff create");
 }
 
 GitDiff::~GitDiff()
 {
-
+    aw::trace::log("GitDiff destroy");
 }
 
 void GitDiff::diffData(const QByteArray &oldData, const QByteArray &newData)

@@ -346,6 +346,8 @@ void DiffModel::setDiff(const QByteArray &left, const QByteArray &right)
     }
 
     endResetModel();
+
+    emit textChanged();
 }
 
 static QByteArray getData(git::repository *repo, const git::object_id &oid)

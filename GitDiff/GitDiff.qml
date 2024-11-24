@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import GitCore
+import MyDiff
 
 ApplicationWindow {
     id: root
@@ -12,6 +13,10 @@ ApplicationWindow {
     property alias headerVisible: header.visible
     property int fontSize: 18
     property string fontFamily: "Monospace"
+
+    Component.onCompleted: {
+        GitDiff.diffFiles(":/MyDiff/tmp/left.txt", ":/MyDiff/tmp/right.txt")
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -33,14 +38,14 @@ ApplicationWindow {
                 anchors.margins: 8
 
                 TextInput {
-                    text: diff.oldFileName
+                    text: GitDiff.oldFileName
                     Layout.fillWidth: true
                     font.pixelSize: root.fontSize
                     font.family: root.fontFamily
                 }
 
                 TextInput {
-                    text: diff.newFileName
+                    text: GitDiff.newFileName
                     Layout.fillWidth: true
                     font.pixelSize: root.fontSize
                     font.family: root.fontFamily
@@ -53,7 +58,7 @@ ApplicationWindow {
             id: rightView
             fontFamily: root.fontFamily
             fontSize: root.fontSize
-            model: lineView.lineModel
+            model: GitDiff.lineModel
             readOnly: true
             Layout.fillWidth: true
             Layout.fillHeight: true
