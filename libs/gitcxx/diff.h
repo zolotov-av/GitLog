@@ -34,6 +34,8 @@ namespace git
         diff& operator = (const diff &) = delete;
         diff& operator = (diff &&other);
 
+        bool isEmpty() const { return m_diff == nullptr; }
+
         unsigned deltaCount() const
         {
             return git_diff_num_deltas(m_diff);

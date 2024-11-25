@@ -7,6 +7,8 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick)
 qt_standard_project_setup()
 
 add_library(GitCore STATIC
+    GitFileInfo.h
+    GitFileInfo.cpp
     GitTools/GitApplication.h
     GitTools/GitApplication.cpp
     GitTools/RefsModel.h
@@ -38,6 +40,10 @@ qt_add_qml_module(GitCore
         qml/CreateBranchDialog.qml
         qml/DeleteBranchDialog.qml
     SOURCES
+        GitRepository.h
+        GitRepository.cpp
+        GitStatusModel.h
+        GitStatusModel.cpp
         GraphItem.h
         GraphItem.cpp
     RESOURCE_PREFIX "/qt/qml"
