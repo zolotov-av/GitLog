@@ -18,7 +18,7 @@ namespace git
     {
         if (error < 0)
         {
-            throw exception(lastGitError());
+            throw exception("%s", lastGitError());
         }
     }
 

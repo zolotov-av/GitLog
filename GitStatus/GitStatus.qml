@@ -39,17 +39,33 @@ ApplicationWindow {
             Layout.fillHeight: true
 
             function gitStage() {
-                if ( currentItem )
+                if ( currentItem ) {
                     console.log("gitStage: " + currentItem.fileName);
+                    statusModel.stageFile(currentItem.fileName);
+                    statusModel.update();
+                }
                 else
                     console.log("gitStage: <NONE>")
             }
 
-            function gitUnstage() {
-                if ( currentItem )
-                    console.log("gitUnstage: " + currentItem.fileName);
+            function gitRestoreStaged() {
+                if ( currentItem ) {
+                    console.log("gitRestoreStaged: " + currentItem.fileName);
+                    statusModel.restoreStaged(currentItem.fileName);
+                    statusModel.update();
+                }
                 else
-                    console.log("gitUnstage: <NONE>")
+                    console.log("gitRestoreStaged: <NONE>")
+            }
+
+            function gitCheckoutHead() {
+                if ( currentItem ) {
+                    console.log("gitCheckoutHead: " + currentItem.fileName);
+                    statusModel.checkoutHead(currentItem.fileName);
+                    statusModel.update();
+                }
+                else
+                    console.log("gitCheckoutHead: <NONE>")
             }
 
             function gitDiff() {
@@ -82,9 +98,14 @@ ApplicationWindow {
                     listView.gitStage();
                     event.accepted = true;
                     break;
-                case Qt.Key_U:
-                    console.log("listView Qt.Key_U pressed");
-                    listView.gitUnstage();
+                case Qt.Key_R:
+                    console.log("listView Qt.Key_R pressed");
+                    listView.gitRestoreStaged();
+                    event.accepted = true;
+                    break;
+                case Qt.Key_C:
+                    console.log("listView Qt.Key_C pressed");
+                    listView.gitCheckoutHead();
                     event.accepted = true;
                     break;
                 case Qt.Key_D:
@@ -96,6 +117,10 @@ ApplicationWindow {
                     console.log("listView Qt.Key_Delete pressed");
                     event.accepted = true;
                     break;
+                case Qt.Key_F5:
+                    console.log("listView Qt.Key_F5 pressed");
+                    event.accepted = true
+                    listView.model.update()
                 }
             }
 
@@ -158,16 +183,16 @@ ApplicationWindow {
                 id: contextMenu
 
                 MenuItem {
-                    text: "Stage File\tS"
+                    text: "Stage\tS"
                     onTriggered: listView.gitStage()
                 }
                 MenuItem {
-                    text: "Unstage File\tU"
-                    onTriggered: listView.gitUnstage();
+                    text: "Restore staged\tR"
+                    onTriggered: listView.gitRestoreStaged()
                 }
                 MenuItem {
-                    text: "Show Diff\tD"
-                    onTriggered: listView.gitDiff();
+                    text: "Checkout HEAD\tC"
+                    onTriggered: listView.gitCheckoutHead()
                 }
             }
         }
@@ -193,7 +218,11 @@ ApplicationWindow {
                 }
 
                 Label {
-                    text: qsTr("Unstage") + " (U)"
+                    text: qsTr("Restore staged") + " (R)"
+                }
+
+                Label {
+                    text: qsTr("Checkout HEAD") + " (C)"
                 }
 
                 Label {

@@ -1,6 +1,7 @@
 #include "GitStatusModel.h"
 #include <GitRepository.h>
 #include <QColor>
+#include <awCore/trace.h>
 
 GitStatusModel::GitStatusModel(QObject *parent): QAbstractItemModel{parent}
 {
@@ -127,4 +128,83 @@ void GitStatusModel::update()
     }
 
     endResetModel();
+}
+
+void GitStatusModel::stageFile(const QString &file)
+{
+    aw::trace::log("GitStatusModel::stageFile() %s", file);
+    if ( m_repo == nullptr || !m_repo->isOpened() )
+        return;
+
+    try
+    {
+        auto index = m_repo->getIndex();
+        index.addByPath(file);
+        index.write();
+    }
+    catch(const std::exception &e)
+    {
+        aw::trace::log("GitStatusModel::stageFile() error: %s", e.what());
+        emit errorOccurred(aw::qt_printf("stage error: %s", e.what()));
+    }
+}
+
+void GitStatusModel::unstageFile(const QString &file)
+{
+    aw::trace::log("GitStatusModel::unstageFile() %s", file);
+    if ( m_repo == nullptr || !m_repo->isOpened() )
+        return;
+
+    try
+    {
+        auto index = m_repo->getIndex();
+        index.removeByPath(file);
+        index.write();
+    }
+    catch(const std::exception &e)
+    {
+        aw::trace::log("GitStatusModel::unstageFile() error: %s", e.what());
+        emit errorOccurred(aw::qt_printf("unstage error: %s", e.what()));
+    }
+}
+
+void GitStatusModel::restoreStaged(const QString &file)
+{
+    aw::trace::log("GitStatusModel::restoreStaged() %s", file);
+    if ( m_repo == nullptr || !m_repo->isOpened() )
+        return;
+
+    try
+    {
+        m_repo->restoreStaged(file);
+    }
+    catch(const std::exception &e)
+    {
+        aw::trace::log("GitStatusModel::restoreStaged() error: %s", e.what());
+        emit errorOccurred(aw::qt_printf("restore staged error: %s", e.what()));
+    }
+}
+
+void GitStatusModel::checkoutHead(const QString &file)
+{
+    aw::trace::log("GitStatusModel::checkoutHead() %s", file);
+    if ( m_repo == nullptr || !m_repo->isOpened() )
+        return;
+
+    try
+    {
+        auto commit = m_repo->lookupCommit(m_repo->head());
+        if ( !commit.commitTree().exists(file) )
+        {
+            aw::trace::log("GitStatusModel::checkoutHead() not found in HEAD: %s", file);
+            return;
+        }
+
+        m_repo->checkoutHead(file);
+    }
+    catch(const std::exception &e)
+    {
+        aw::trace::log("GitStatusModel::checkoutHead() error: %s", e.what());
+        emit errorOccurred(aw::qt_printf("checkout HEAD error: %s", e.what()));
+    }
 }

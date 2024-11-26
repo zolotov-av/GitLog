@@ -30,4 +30,6 @@ public:
 
     GitStatusModel* model() { return &m_model; }
 
+    Q_INVOKABLE void stageFile(const QString &file);
+
 };

@@ -94,6 +94,26 @@ namespace git
 
         git::diff diff_cached(const git::tree &a);
 
+        /**
+         * @brief Восстановить файл в индексе из HEAD
+         * @param file путь к файлу (относительно рабочего каталога)
+         *
+         * Аналог команды git restore --staged file
+         *
+         * Восстанавливает только индекс, оставляя рабочий каталог как есть
+         */
+        void restoreStaged(const QString &file);
+
+        /**
+         * @brief Восстановить файл из HEAD
+         * @param file путь к файлу (относительно рабочего каталога)
+         *
+         * Аналог команды git checkout HEAD -- file
+         *
+         * Обновляет индекс и рабочий каталог
+         */
+        void checkoutHead(const QString &file);
+
         void createCommit(const QString &author_name, const QString &author_email, const QString &message);
 
         git_repository* data() const

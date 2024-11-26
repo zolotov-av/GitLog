@@ -3,6 +3,7 @@
 #include "common.h"
 #include "oid.h"
 #include "signature.h"
+#include "tree.h"
 #include <QDateTime>
 
 namespace git
@@ -69,6 +70,8 @@ namespace git
         {
             return git_commit_parent_id(m_commit, n);
         }
+
+        tree commitTree();
 
         const git_commit* data() const
         {

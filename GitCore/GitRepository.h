@@ -35,6 +35,35 @@ public:
 
     git::repository* repo() { return &m_repo; }
 
+    git::index getIndex() { return m_repo.getIndex(); }
+
+    git::reference head() { return m_repo.head(); }
+
+    git::commit lookupCommit(const git_oid *id) { return m_repo.lookupCommit(id); }
+    git::commit lookupCommit(const git::object_id &oid) { return m_repo.lookupCommit(oid); }
+    git::commit lookupCommit(const QString &hash) { return m_repo.lookupCommit(hash); }
+    git::commit lookupCommit(const git::reference &ref) { return m_repo.lookupCommit(ref.resolve().target()); }
+
+    /**
+     * @brief Восстановить файл в индексе из HEAD
+     * @param file путь к файлу (относительно рабочего каталога)
+     *
+     * Аналог команды git restore --staged file
+     *
+     * Восстанавливает только индекс, оставляя рабочий каталог как есть
+     */
+    void restoreStaged(const QString &file) { m_repo.restoreStaged(file); }
+
+    /**
+     * @brief Восстановить файл из HEAD
+     * @param file путь к файлу (относительно рабочего каталога)
+     *
+     * Аналог команды git checkout HEAD -- file
+     *
+     * Обновляет индекс и рабочий каталог
+     */
+    void checkoutHead(const QString &file) { m_repo.checkoutHead(file); }
+
 signals:
 
     void pathChanged();

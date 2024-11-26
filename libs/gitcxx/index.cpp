@@ -21,4 +21,21 @@ namespace git
         return { entry->id };
     }
 
+    void index::addByPath(const QString &path)
+    {
+        const auto utf8_path = path.toUtf8();
+        check( git_index_add_bypath(m_index, utf8_path.constData()) );
+    }
+
+    void index::removeByPath(const QString &path)
+    {
+        const auto utf8_path = path.toUtf8();
+        check( git_index_remove_bypath(m_index, utf8_path.constData()) );
+    }
+
+    void index::write()
+    {
+        check( git_index_write(m_index) );
+    }
+
 }

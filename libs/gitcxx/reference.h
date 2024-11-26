@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "oid.h"
+#include "object.h"
 
 namespace git
 {
@@ -66,6 +67,7 @@ namespace git
         QString shortName() const;
 
         reference resolve() const;
+        object peel(git_object_t objectType = GIT_OBJECT_ANY);
 
         void deleteReference();
         void deleteBranch();

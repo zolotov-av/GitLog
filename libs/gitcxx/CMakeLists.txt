@@ -16,6 +16,8 @@ add_library(gitcxx STATIC
     common.cpp
     oid.h
     oid.cpp
+    object.h
+    object.cpp
     reference.h
     reference.cpp
     signature.h

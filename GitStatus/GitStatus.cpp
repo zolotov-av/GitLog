@@ -1,5 +1,6 @@
 #include "GitStatus.h"
 #include <QDir>
+#include <awCore/trace.h>
 
 GitStatus::GitStatus(QObject *parent): QObject{parent}
 {
@@ -11,4 +12,9 @@ GitStatus::GitStatus(QObject *parent): QObject{parent}
 GitStatus::~GitStatus()
 {
 
+}
+
+void GitStatus::stageFile(const QString &file)
+{
+    aw::trace::log("GitStatus::stageFile() %s", file);
 }

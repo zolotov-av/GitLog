@@ -38,4 +38,11 @@ namespace git
         return QDateTime::fromSecsSinceEpoch(git_commit_time(m_commit));
     }
 
+    tree commit::commitTree()
+    {
+        git_tree *commitTree { nullptr };
+        check( git_commit_tree(&commitTree, m_commit) );
+        return tree{commitTree};
+    }
+
 }

@@ -155,6 +155,35 @@ namespace git
         return { d };
     }
 
+    void repository::restoreStaged(const QString &file)
+    {
+        auto HEAD = head().peel(GIT_OBJECT_COMMIT);
+
+        // Настраиваем pathspec
+        git_strarray pathspec { };
+        auto utf8_path = file.toUtf8();
+        char *paths[] = { utf8_path.data() };
+        pathspec.strings = paths;
+        pathspec.count = 1;
+
+        // Сбрасываем файл к состоянию в HEAD
+        check( git_reset_default(m_repo, HEAD.data(), &pathspec) );
+    }
+
+    void repository::checkoutHead(const QString &file)
+    {
+        git_checkout_options opts = GIT_CHECKOUT_OPTIONS_INIT;
+        opts.checkout_strategy = GIT_CHECKOUT_FORCE;
+        git_strarray paths { };
+        auto utf8_path = file.toUtf8();
+        char *pathspec[] = { utf8_path.data() };
+        paths.strings = pathspec;
+        paths.count = 1;
+        opts.paths = paths;
+
+        check( git_checkout_head(m_repo, &opts) );
+    }
+
     void repository::createCommit(const QString &author_name, const QString &author_email, const QString &message)
     {
         const auto name = author_name.toUtf8();

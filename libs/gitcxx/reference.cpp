@@ -30,6 +30,13 @@ namespace git
         return reference(out);
     }
 
+    object reference::peel(git_object_t objectType)
+    {
+        git_object *obj { nullptr };
+        check( git_reference_peel(&obj, m_ref, objectType));
+        return object{ obj };
+    }
+
     void reference::deleteReference()
     {
         check( git_reference_delete(m_ref) );

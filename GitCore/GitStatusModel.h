@@ -55,8 +55,33 @@ public:
 
     Q_INVOKABLE void update();
 
+    /**
+     * @brief Добавить файл в индекс
+     * @param file путь к файлу (относительно рабочего каталога)
+     */
+    Q_INVOKABLE void stageFile(const QString &file);
+
+    /**
+     * @brief Удалить файл из индекса
+     * @param file путь к файлу (относительно рабочего каталога)
+     */
+    Q_INVOKABLE void unstageFile(const QString &file);
+
+    /**
+     * @brief Восстановить файл в индексе (как в HEAD)
+     * @param file путь к файлу (относительно рабочего каталога)
+     */
+    Q_INVOKABLE void restoreStaged(const QString &file);
+
+    /**
+     * @brief Восстановить файл в индексе и рабочем каталоге из HEAD
+     * @param file путь к файлу (относительно рабочего каталога)
+     */
+    Q_INVOKABLE void checkoutHead(const QString &file);
+
 signals:
 
     void repositoryChanged();
+    void errorOccurred(const QString &message);
 
 };

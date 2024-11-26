@@ -41,6 +41,23 @@ namespace git
 
         object_id oidByPath(const QString &path);
 
+        /**
+         * @brief Добавить файл в индекс
+         * @param path путь к файлу (относительно рабочего каталога)
+         */
+        void addByPath(const QString &path);
+
+        /**
+         * @brief Удалить файл из индекса
+         * @param path путь к файлу (относительно рабочего каталога)
+         */
+        void removeByPath(const QString &path);
+
+        /**
+         * @brief Записать индекс на диск
+         */
+        void write();
+
     };
 
 }

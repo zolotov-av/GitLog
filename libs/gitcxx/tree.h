@@ -1,10 +1,12 @@
 #pragma once
 
 #include "common.h"
-#include "commit.h"
+#include "oid.h"
 
 namespace git
 {
+
+    class commit;
 
     /**
      * @brief Класс представляющий дерево коммита
@@ -74,6 +76,7 @@ namespace git
         tree& operator = (const tree &) = delete;
         tree& operator = (tree &&other);
 
+        bool exists(const QString &path);
         entry entryByPath(const QString &path) const;
 
         git_tree* data() const

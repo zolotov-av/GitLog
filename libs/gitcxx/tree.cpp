@@ -1,4 +1,6 @@
 #include "tree.h"
+#include "commit.h"
+#include "exception.h"
 
 namespace git
 {
@@ -27,6 +29,19 @@ namespace git
         m_tree = other.m_tree;
         other.m_tree = nullptr;
         return *this;
+    }
+
+    bool tree::exists(const QString &path)
+    {
+        const auto utf8_path = path.toUtf8();
+        git_tree_entry *ent { nullptr };
+        const auto ret = git_tree_entry_bypath(&ent, m_tree, utf8_path.constData());
+        if ( ret == 0 )
+            return true;
+        if ( ret == GIT_ENOTFOUND )
+            return false;
+
+        throw exception("%s", lastGitError());
     }
 
     tree::entry tree::entryByPath(const QString &path) const
