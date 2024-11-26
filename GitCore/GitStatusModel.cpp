@@ -133,74 +133,31 @@ void GitStatusModel::update()
 void GitStatusModel::stageFile(const QString &file)
 {
     aw::trace::log("GitStatusModel::stageFile() %s", file);
-    if ( m_repo == nullptr || !m_repo->isOpened() )
-        return;
 
-    try
-    {
-        m_repo->stageAll(file, GIT_INDEX_ADD_DISABLE_PATHSPEC_MATCH | GIT_INDEX_ADD_CHECK_PATHSPEC);
-    }
-    catch(const std::exception &e)
-    {
-        aw::trace::log("GitStatusModel::stageFile() error: %s", e.what());
-        emit errorOccurred(aw::qt_printf("stage error: %s", e.what()));
-    }
+    if ( m_repo )
+        m_repo->stageFile(file);
 }
 
 void GitStatusModel::restoreStaged(const QString &file)
 {
     aw::trace::log("GitStatusModel::restoreStaged() %s", file);
-    if ( m_repo == nullptr || !m_repo->isOpened() )
-        return;
 
-    try
-    {
+    if ( m_repo )
         m_repo->restoreStaged(file);
-    }
-    catch(const std::exception &e)
-    {
-        aw::trace::log("GitStatusModel::restoreStaged() error: %s", e.what());
-        emit errorOccurred(aw::qt_printf("restore staged error: %s", e.what()));
-    }
 }
 
 void GitStatusModel::checkoutHead(const QString &file)
 {
     aw::trace::log("GitStatusModel::checkoutHead() %s", file);
-    if ( m_repo == nullptr || !m_repo->isOpened() )
-        return;
 
-    try
-    {
-        auto commit = m_repo->lookupCommit(m_repo->head());
-        if ( !commit.commitTree().exists(file) )
-        {
-            aw::trace::log("GitStatusModel::checkoutHead() not found in HEAD: %s", file);
-            return;
-        }
-
+    if ( m_repo )
         m_repo->checkoutHead(file);
-    }
-    catch(const std::exception &e)
-    {
-        aw::trace::log("GitStatusModel::checkoutHead() error: %s", e.what());
-        emit errorOccurred(aw::qt_printf("checkout HEAD error: %s", e.what()));
-    }
 }
 
 void GitStatusModel::removeFile(const QString &file)
 {
     aw::trace::log("GitStatusModel::removeFile() %s", file);
-    if ( m_repo == nullptr || !m_repo->isOpened() )
-        return;
 
-    try
-    {
+    if ( m_repo )
         m_repo->removeFile(file);
-    }
-    catch(const std::exception &e)
-    {
-        aw::trace::log("GitStatusModel::removeFile() error: %s", e.what());
-        emit errorOccurred(aw::qt_printf("remove file error: %s", e.what()));
-    }
 }

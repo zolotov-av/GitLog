@@ -180,7 +180,7 @@ ApplicationWindow {
                 }
 
                 Shortcut {
-                    sequences: [StandardKey.Delete]
+                    sequences: ["D", StandardKey.Delete]
                     onActivated: listView.gitRemoveFile()
                 }
 
@@ -242,7 +242,7 @@ ApplicationWindow {
                 }
 
                 Label {
-                    text: qsTr("Remove") + " (DEL)"
+                    text: qsTr("Remove") + " (D, DEL)"
                 }
 
                 Label {

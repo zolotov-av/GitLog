@@ -25,6 +25,13 @@ public:
     GitRepository& operator = (const GitRepository &) = delete;
     GitRepository& operator = (GitRepository &&) = delete;
 
+private:
+
+    template <typename ...Args>
+    void emitError(const char *fmt, const Args&... args);
+
+public:
+
     const QString& path() const { return m_path; }
     void setPath(const QString &value);
 
@@ -50,7 +57,15 @@ public:
      *
      * Аналог команды git add -- path
      */
-    void stageAll(const QString &path, unsigned flags = GIT_INDEX_ADD_DEFAULT) { m_repo.stageAll(path, flags); }
+    Q_INVOKABLE void stageAll(const QString &path, unsigned flags = GIT_INDEX_ADD_DEFAULT);
+
+    /**
+     * @brief Добавить файл в индекс
+     * @param file путь к файлу (относительно рабочего каталога)
+     *
+     * Аналог команды git add -- file
+     */
+    Q_INVOKABLE void stageFile(const QString &file);
 
     /**
      * @brief Восстановить файл в индексе из HEAD
@@ -60,7 +75,7 @@ public:
      *
      * Восстанавливает только индекс, оставляя рабочий каталог как есть
      */
-    void restoreStaged(const QString &file) { m_repo.restoreStaged(file); }
+    Q_INVOKABLE void restoreStaged(const QString &file);
 
     /**
      * @brief Восстановить файл из HEAD
@@ -70,7 +85,7 @@ public:
      *
      * Обновляет индекс и рабочий каталог
      */
-    void checkoutHead(const QString &file) { m_repo.checkoutHead(file); }
+    Q_INVOKABLE void checkoutHead(const QString &file);
 
     /**
      * @brief Удалить файл в рабочем каталоге и в индексе
@@ -80,7 +95,7 @@ public:
      *
      * Обновляет индекс и рабочий каталог
      */
-    void removeFile(const QString &file) { m_repo.removeFile(file); }
+    Q_INVOKABLE void removeFile(const QString &file);
 
     /**
      * @brief commit

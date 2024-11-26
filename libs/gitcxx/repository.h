@@ -77,6 +77,7 @@ namespace git
         }
 
         commit lookupCommit(const QString &hash);
+        commit lookupCommit(const git::reference &ref);
 
         revwalk newRevwalk();
 

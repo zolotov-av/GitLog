@@ -104,6 +104,11 @@ namespace git
         return lookupCommit(object_id{hash});
     }
 
+    commit repository::lookupCommit(const reference &ref)
+    {
+        return lookupCommit(ref.resolve().target());
+    }
+
     revwalk repository::newRevwalk()
     {
         git_revwalk *rw { nullptr };

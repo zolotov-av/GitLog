@@ -58,30 +58,43 @@ public:
     /**
      * @brief Добавить файл в индекс
      * @param file путь к файлу (относительно рабочего каталога)
+     *
+     * Аналог команды git add -- file
      */
     Q_INVOKABLE void stageFile(const QString &file);
 
     /**
-     * @brief Восстановить файл в индексе (как в HEAD)
+     * @brief Восстановить файл в индексе из HEAD
      * @param file путь к файлу (относительно рабочего каталога)
+     *
+     * Аналог команды git restore --staged file
+     *
+     * Восстанавливает только индекс, оставляя рабочий каталог как есть
      */
     Q_INVOKABLE void restoreStaged(const QString &file);
 
     /**
-     * @brief Восстановить файл в индексе и рабочем каталоге из HEAD
+     * @brief Восстановить файл из HEAD
      * @param file путь к файлу (относительно рабочего каталога)
+     *
+     * Аналог команды git checkout HEAD -- file
+     *
+     * Обновляет индекс и рабочий каталог
      */
     Q_INVOKABLE void checkoutHead(const QString &file);
 
     /**
-     * @brief Удалить файл в индексе и рабочем каталоге
+     * @brief Удалить файл в рабочем каталоге и в индексе
      * @param file путь к файлу (относительно рабочего каталога)
+     *
+     * Аналог команды git rm -- file
+     *
+     * Обновляет индекс и рабочий каталог
      */
     Q_INVOKABLE void removeFile(const QString &file);
 
 signals:
 
     void repositoryChanged();
-    void errorOccurred(const QString &message);
 
 };
