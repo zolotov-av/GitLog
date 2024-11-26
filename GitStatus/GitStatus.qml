@@ -38,6 +38,13 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
+            function gitMenu() {
+                if (currentItem) {
+                    var pos = currentItem.mapToItem(listView, 0, currentItem.height);
+                    contextMenu.popup(pos.x, pos.y)
+                }
+            }
+
             function gitStage() {
                 if ( currentItem ) {
                     console.log("gitStage: " + currentItem.fileName);
@@ -78,42 +85,23 @@ ApplicationWindow {
                     console.log("gitRemoveFile: <NONE>")
             }
 
+            function gitUpdate() {
+                console.log("gitUpdate")
+                statusModel.update();
+            }
+
             function handleKeys(event)
             {
+                if (event.modifiers !== 0)
+                    return;
+
                 switch (event.key )
                 {
                 case Qt.Key_Space:
                     console.log("listView Qt.Key_Space pressed");
-                    if (currentItem) {
-                        var pos = currentItem.mapToItem(listView, 0, currentItem.height);
-                        contextMenu.popup(pos.x, pos.y)
-                    }
+                    listView.gitMenu();
                     event.accepted = true;
                     break;
-                case Qt.Key_S:
-                    console.log("listView Qt.Key_S pressed");
-                    listView.gitStage();
-                    event.accepted = true;
-                    break;
-                case Qt.Key_R:
-                    console.log("listView Qt.Key_R pressed");
-                    listView.gitRestoreStaged();
-                    event.accepted = true;
-                    break;
-                case Qt.Key_C:
-                    console.log("listView Qt.Key_C pressed");
-                    listView.gitCheckoutHead();
-                    event.accepted = true;
-                    break;
-                case Qt.Key_Delete:
-                    console.log("listView Qt.Key_Delete pressed");
-                    listView.gitRemoveFile();
-                    event.accepted = true;
-                    break;
-                case Qt.Key_F5:
-                    console.log("listView Qt.Key_F5 pressed");
-                    event.accepted = true
-                    listView.model.update()
                 }
             }
 
@@ -172,23 +160,53 @@ ApplicationWindow {
                 }
             }
 
+            Item {
+                enabled: listView.activeFocus
+
+                Shortcut {
+                    sequence: "S"
+                    onActivated: listView.gitStage()
+                }
+
+                Shortcut {
+                    sequence: "R"
+                    onActivated: listView.gitRestoreStaged()
+                }
+
+                Shortcut {
+                    sequence: "C"
+                    onActivated: listView.gitCheckoutHead()
+                }
+
+                Shortcut {
+                    sequences: [StandardKey.Delete]
+                    onActivated: listView.gitRemoveFile()
+                }
+
+                Shortcut {
+                    sequences: ["Ctrl+R", "F5"]
+                    onActivated: listView.gitUpdate()
+                }
+
+            }
+
             Menu {
                 id: contextMenu
 
                 MenuItem {
-                    text: "Stage\tS"
+                    text: qsTr("Stage") + " (S)"
                     onTriggered: listView.gitStage()
                 }
                 MenuItem {
-                    text: "Restore staged\tR"
+                    text: qsTr("Restore staged") + " (R)"
                     onTriggered: listView.gitRestoreStaged()
                 }
                 MenuItem {
-                    text: "Checkout HEAD\tC"
+                    text: qsTr("Checkout HEAD") + " (C)"
                     onTriggered: listView.gitCheckoutHead()
                 }
                 MenuItem {
-                    text: "Remove\tDEL"
+                    text: qsTr("Remove") + " (DEL)"
                     onTriggered: listView.gitRemoveFile();
                 }
             }
