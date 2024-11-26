@@ -181,7 +181,11 @@ ApplicationWindow {
 
                 Shortcut {
                     sequences: ["D", StandardKey.Delete]
-                    onActivated: listView.gitRemoveFile()
+                    onActivated: {
+                        if (listView.currentItem) {
+                            deleteConfirmDialog.open()
+                        }
+                    }
                 }
 
                 Shortcut {
@@ -304,5 +308,24 @@ ApplicationWindow {
                 }
             }
         }
+    }
+
+    Dialog {
+        id: deleteConfirmDialog
+        title: qsTr("Confirm Delete")
+        modal: true
+        anchors.centerIn: parent
+        focus: true
+
+        Label {
+            text: listView.currentItem && deleteConfirmDialog.visible ?
+                qsTr("Are you sure you want to delete '%1'?").arg(listView.currentItem.fileName) :
+                qsTr("No file selected")
+        }
+
+        standardButtons: Dialog.Yes | Dialog.No
+        onOpened: standardButton(Dialog.Yes).forceActiveFocus()
+
+        onAccepted: listView.gitRemoveFile()
     }
 }
