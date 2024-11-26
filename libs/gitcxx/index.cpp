@@ -27,6 +27,17 @@ namespace git
         check( git_index_add_bypath(m_index, utf8_path.constData()) );
     }
 
+    void index::addAll(const QString &path, unsigned int flags)
+    {
+        git_strarray pathspec { };
+        auto utf8_path = path.toUtf8();
+        char *paths[] = { utf8_path.data() };
+        pathspec.strings = paths;
+        pathspec.count = 1;
+
+        check( git_index_add_all(m_index, &pathspec, flags, nullptr, nullptr) );
+    }
+
     void index::removeByPath(const QString &path)
     {
         const auto utf8_path = path.toUtf8();

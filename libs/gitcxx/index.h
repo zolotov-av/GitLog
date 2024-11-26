@@ -48,6 +48,12 @@ namespace git
         void addByPath(const QString &path);
 
         /**
+         * @brief Добавить файл/каталог в индекс
+         * @param path путь к файлу (относительно рабочего каталога)
+         */
+        void addAll(const QString &path, unsigned flags = GIT_INDEX_ADD_DEFAULT);
+
+        /**
          * @brief Удалить файл из индекса
          * @param path путь к файлу (относительно рабочего каталога)
          */
@@ -57,6 +63,8 @@ namespace git
          * @brief Записать индекс на диск
          */
         void write();
+
+        git_index* data() { return m_index; }
 
     };
 

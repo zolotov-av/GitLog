@@ -95,6 +95,14 @@ namespace git
         git::diff diff_cached(const git::tree &a);
 
         /**
+         * @brief Добавить файл/каталог в индекс
+         * @param path путь к файлу (относительно рабочего каталога)
+         *
+         * Аналог команды git add -- path
+         */
+        void stageAll(const QString &path, unsigned flags = GIT_INDEX_ADD_DEFAULT);
+
+        /**
          * @brief Восстановить файл в индексе из HEAD
          * @param file путь к файлу (относительно рабочего каталога)
          *
@@ -113,6 +121,16 @@ namespace git
          * Обновляет индекс и рабочий каталог
          */
         void checkoutHead(const QString &file);
+
+        /**
+         * @brief Удалить файл в рабочем каталоге и в индексе
+         * @param file путь к файлу (относительно рабочего каталога)
+         *
+         * Аналог команды git rm -- file
+         *
+         * Обновляет индекс и рабочий каталог
+         */
+        void removeFile(const QString &file);
 
         void createCommit(const QString &author_name, const QString &author_email, const QString &message);
 

@@ -45,6 +45,14 @@ public:
     git::commit lookupCommit(const git::reference &ref) { return m_repo.lookupCommit(ref.resolve().target()); }
 
     /**
+     * @brief Добавить файл/каталог в индекс
+     * @param path путь к файлу (относительно рабочего каталога)
+     *
+     * Аналог команды git add -- path
+     */
+    void stageAll(const QString &path, unsigned flags = GIT_INDEX_ADD_DEFAULT) { m_repo.stageAll(path, flags); }
+
+    /**
      * @brief Восстановить файл в индексе из HEAD
      * @param file путь к файлу (относительно рабочего каталога)
      *
@@ -63,6 +71,16 @@ public:
      * Обновляет индекс и рабочий каталог
      */
     void checkoutHead(const QString &file) { m_repo.checkoutHead(file); }
+
+    /**
+     * @brief Удалить файл в рабочем каталоге и в индексе
+     * @param file путь к файлу (относительно рабочего каталога)
+     *
+     * Аналог команды git rm -- file
+     *
+     * Обновляет индекс и рабочий каталог
+     */
+    void removeFile(const QString &file) { m_repo.removeFile(file); }
 
 signals:
 

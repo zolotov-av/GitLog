@@ -138,33 +138,12 @@ void GitStatusModel::stageFile(const QString &file)
 
     try
     {
-        auto index = m_repo->getIndex();
-        index.addByPath(file);
-        index.write();
+        m_repo->stageAll(file, GIT_INDEX_ADD_DISABLE_PATHSPEC_MATCH | GIT_INDEX_ADD_CHECK_PATHSPEC);
     }
     catch(const std::exception &e)
     {
         aw::trace::log("GitStatusModel::stageFile() error: %s", e.what());
         emit errorOccurred(aw::qt_printf("stage error: %s", e.what()));
-    }
-}
-
-void GitStatusModel::unstageFile(const QString &file)
-{
-    aw::trace::log("GitStatusModel::unstageFile() %s", file);
-    if ( m_repo == nullptr || !m_repo->isOpened() )
-        return;
-
-    try
-    {
-        auto index = m_repo->getIndex();
-        index.removeByPath(file);
-        index.write();
-    }
-    catch(const std::exception &e)
-    {
-        aw::trace::log("GitStatusModel::unstageFile() error: %s", e.what());
-        emit errorOccurred(aw::qt_printf("unstage error: %s", e.what()));
     }
 }
 
@@ -206,5 +185,22 @@ void GitStatusModel::checkoutHead(const QString &file)
     {
         aw::trace::log("GitStatusModel::checkoutHead() error: %s", e.what());
         emit errorOccurred(aw::qt_printf("checkout HEAD error: %s", e.what()));
+    }
+}
+
+void GitStatusModel::removeFile(const QString &file)
+{
+    aw::trace::log("GitStatusModel::removeFile() %s", file);
+    if ( m_repo == nullptr || !m_repo->isOpened() )
+        return;
+
+    try
+    {
+        m_repo->removeFile(file);
+    }
+    catch(const std::exception &e)
+    {
+        aw::trace::log("GitStatusModel::removeFile() error: %s", e.what());
+        emit errorOccurred(aw::qt_printf("remove file error: %s", e.what()));
     }
 }

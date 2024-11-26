@@ -1,4 +1,7 @@
 #include "repository.h"
+#include "exception.h"
+#include <QDir>
+#include <QFile>
 
 namespace git
 {
@@ -155,6 +158,13 @@ namespace git
         return { d };
     }
 
+    void repository::stageAll(const QString &path, unsigned int flags)
+    {
+        auto index = getIndex();
+        index.addAll(path, flags);
+        index.write();
+    }
+
     void repository::restoreStaged(const QString &file)
     {
         auto HEAD = head().peel(GIT_OBJECT_COMMIT);
@@ -182,6 +192,29 @@ namespace git
         opts.paths = paths;
 
         check( git_checkout_head(m_repo, &opts) );
+    }
+
+    void repository::removeFile(const QString &file)
+    {
+        auto index = getIndex();
+        index.removeByPath(file);
+        index.write();
+
+        QFileInfo fileInfo { QDir{workdir()}.filePath(file) };
+
+        if ( fileInfo.isDir() ) {
+            QDir dir{fileInfo.filePath()};
+            if ( dir.removeRecursively() )
+                return;
+
+            throw exception("remove dir failed");
+        }
+
+        QFile qFile{ fileInfo.filePath() };
+        if ( !qFile.remove() )
+        {
+            throw exception("%s", qFile.errorString());
+        }
     }
 
     void repository::createCommit(const QString &author_name, const QString &author_email, const QString &message)
