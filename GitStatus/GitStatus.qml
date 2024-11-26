@@ -24,6 +24,7 @@ ApplicationWindow {
         id: statusModel
 
         repository: GitRepository {
+            id: gitRepo
             path: "/home/alex/prj/test/GitTest"
         }
     }
@@ -251,8 +252,57 @@ ApplicationWindow {
                 Item {
                     Layout.fillWidth: true
                 }
+
+                Button {
+                    id: commitButton
+                    text: qsTr("Commit")
+                    onClicked: commitDialog.open()
+                }
             }
 
+        }
+    }
+
+    Dialog {
+        id: commitDialog
+        title: qsTr("Commit Changes")
+        modal: true
+        anchors.centerIn: parent
+        width: 600
+        height: 300
+
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 10
+
+            TextArea {
+                id: commitMessage
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                placeholderText: qsTr("Enter commit message...")
+                wrapMode: TextArea.Wrap
+            }
+
+            RowLayout {
+                Layout.alignment: Qt.AlignRight
+                spacing: 10
+
+                Button {
+                    text: qsTr("Cancel")
+                    onClicked: commitDialog.close()
+                }
+
+                Button {
+                    text: qsTr("Commit")
+                    onClicked: {
+                        // TODO: Implement commit functionality
+                        console.log("Commit message:", commitMessage.text)
+                        commitDialog.close()
+                        gitRepo.commit(commitMessage.text)
+                        statusModel.update()
+                    }
+                }
+            }
         }
     }
 }

@@ -32,3 +32,20 @@ void GitRepository::close()
     const aw::trace fn("GitRepository::close()");
     m_repo.close();
 }
+
+void GitRepository::commit(const QString &message)
+{
+    if ( message.isEmpty() ) {
+        aw::trace::log("GitRepository::commit() error: message is empty");
+        emit errorOccurred("GitRepository::commit() error: message is empty");
+        return;
+    }
+
+    aw::trace::log("GitRepository::commit() message: %s", message);
+
+    git::config cfg = m_repo.getConfig();
+    const auto authorName = cfg.getString("user.name");
+    const auto authorMail = cfg.getString("user.email");
+
+    m_repo.createCommit(authorName, authorMail, message);
+}

@@ -82,8 +82,15 @@ public:
      */
     void removeFile(const QString &file) { m_repo.removeFile(file); }
 
+    /**
+     * @brief commit
+     * @param message
+     */
+    Q_INVOKABLE void commit(const QString &message);
+
 signals:
 
     void pathChanged();
+    void errorOccurred(const QString &message);
 
 };
