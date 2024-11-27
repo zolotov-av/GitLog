@@ -101,7 +101,15 @@ public:
      * @brief commit
      * @param message
      */
-    Q_INVOKABLE void commit(const QString &message);
+    Q_INVOKABLE void commit(const QString &message, bool amend = false);
+
+    /**
+     * @brief Исправить коммит
+     * @param message новое сообщение
+     *
+     * Аналог команды git commit --amend -m message
+     */
+    Q_INVOKABLE void amend(const QString &message);
 
 signals:
 

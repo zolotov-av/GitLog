@@ -66,5 +66,6 @@ namespace git
 
     class object_id;
     class repository;
+    class tree;
 
 }

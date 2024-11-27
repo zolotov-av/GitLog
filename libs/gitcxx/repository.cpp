@@ -109,6 +109,13 @@ namespace git
         return lookupCommit(ref.resolve().target());
     }
 
+    tree repository::lookupTree(const object_id &oid)
+    {
+        git_tree *out { nullptr };
+        check( git_tree_lookup(&out, m_repo, oid.data()) );
+        return tree { out };
+    }
+
     revwalk repository::newRevwalk()
     {
         git_revwalk *rw { nullptr };
@@ -222,39 +229,56 @@ namespace git
         }
     }
 
+    signature repository::signatureDefault()
+    {
+        git_signature *sig { nullptr };
+        check( git_signature_default(&sig, m_repo) );
+        return signature{ sig };
+    }
+
     void repository::createCommit(const QString &author_name, const QString &author_email, const QString &message)
     {
-        const auto name = author_name.toUtf8();
-        const auto email = author_email.toUtf8();
         const auto msg = message.toUtf8();
 
-        git_oid tree_id, parent_id, commit_id;
-        git_tree *tree;
-        git_commit *parent;
-        git_index *index;
+        git_oid commit_id;
 
-        git_signature *author;
-        git_signature_now(&author, name.data(), email.data());
+        auto author = signature::now(author_name, author_email);
 
-        // Get the index and write it to a tree
-        git_repository_index(&index, m_repo);
-        git_index_write_tree(&tree_id, index);
-        git_tree_lookup(&tree, m_repo, &tree_id);
+        auto index = getIndex();
+        auto tree_id = index.writeTree();
+        auto tree = lookupTree(tree_id);
+        auto parent = lookupCommit(head());
 
-        // Get HEAD as a commit object to use as the parent of the commit
-        git_reference_name_to_id(&parent_id, m_repo, "HEAD");
-        git_commit_lookup(&parent, m_repo, &parent_id);
+        const git_commit* parents[1] = { parent.data() };
+        git_commit_create(&commit_id, m_repo, "HEAD", author.data(), author.data(), "UTF-8", msg.data(), tree.data(), 1, parents);
 
-        const git_commit* parents[1];
-        parents[0] = parent;
-        git_commit_create(&commit_id, m_repo, "HEAD", author, author, "UTF-8", msg.data(), tree, 1, parents);
+        index.readTree(tree);
+    }
 
-        git_index_read_tree(index, tree);
+    object_id repository::createCommit(const QString &message)
+    {
+        auto author = signatureDefault();
+        auto tree = lookupTree(getIndex().writeTree());
+        auto parent = lookupCommit(head());
+        const git_commit* parents[1] = { parent.data() };
+        const auto utf8_msg = message.toUtf8();
 
-        git_tree_free(tree);
-        git_commit_free(parent);
-        git_index_free(index);
-        git_signature_free(author);
+        git_oid commit_id { };
+        git_commit_create(&commit_id, m_repo, "HEAD", author.data(), author.data(), "UTF-8", utf8_msg.constData(), tree.data(), 1, parents);
+
+        return object_id{ &commit_id };
+    }
+
+    object_id repository::amendCommit(const QString &message)
+    {
+        auto tree = lookupTree(getIndex().writeTree());
+        auto commit = lookupCommit(head());
+        const auto utf8_message = message.toUtf8();
+
+        git_oid commit_id { };
+        check( git_commit_amend(&commit_id, commit.data(), "HEAD", nullptr, nullptr, nullptr, utf8_message.constData(), tree.data()) );
+
+        return object_id{ &commit_id };
     }
 
 }

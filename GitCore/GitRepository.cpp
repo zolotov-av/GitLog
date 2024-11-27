@@ -121,7 +121,7 @@ void GitRepository::removeFile(const QString &file)
     }
 }
 
-void GitRepository::commit(const QString &message)
+void GitRepository::commit(const QString &message, bool amend)
 {
     if ( message.isEmpty() ) {
         aw::trace::log("GitRepository::commit() error: message is empty");
@@ -131,9 +131,25 @@ void GitRepository::commit(const QString &message)
 
     aw::trace::log("GitRepository::commit() message: %s", message);
 
-    git::config cfg = m_repo.getConfig();
-    const auto authorName = cfg.getString("user.name");
-    const auto authorMail = cfg.getString("user.email");
+    if ( amend )
+    {
+        m_repo.amendCommit(message);
+    }
+    else
+    {
+        m_repo.createCommit(message);
+    }
+}
 
-    m_repo.createCommit(authorName, authorMail, message);
+void GitRepository::amend(const QString &message)
+{
+    if ( message.isEmpty() ) {
+        aw::trace::log("GitRepository::amend() error: message is empty");
+        emit errorOccurred("GitRepository::amend() error: message is empty");
+        return;
+    }
+
+    aw::trace::log("GitRepository::amend() message: %s", message);
+
+    m_repo.amendCommit(message);
 }

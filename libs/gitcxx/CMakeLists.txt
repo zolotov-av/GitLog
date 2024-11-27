@@ -20,7 +20,10 @@ add_library(gitcxx STATIC
     object.cpp
     reference.h
     reference.cpp
+    SignatureInfo.h
+    SignatureInfo.cpp
     signature.h
+    signature.cpp
     blob.h
     blob.cpp
     commit.h

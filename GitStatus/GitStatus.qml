@@ -275,6 +275,11 @@ ApplicationWindow {
         width: 600
         height: 300
 
+        onOpened: {
+            commitMessage.text = ""
+            amendCheckBox.checked = false
+        }
+
         ColumnLayout {
             anchors.fill: parent
             spacing: 10
@@ -285,6 +290,11 @@ ApplicationWindow {
                 Layout.fillHeight: true
                 placeholderText: qsTr("Enter commit message...")
                 wrapMode: TextArea.Wrap
+            }
+
+            CheckBox {
+                id: amendCheckBox
+                text: qsTr("Amend Last Commit")
             }
 
             RowLayout {
@@ -299,11 +309,11 @@ ApplicationWindow {
                 Button {
                     text: qsTr("Commit")
                     onClicked: {
-                        // TODO: Implement commit functionality
                         console.log("Commit message:", commitMessage.text)
-                        commitDialog.close()
-                        gitRepo.commit(commitMessage.text)
+                        console.log("Amend:", amendCheckBox.checked)
+                        gitRepo.commit(commitMessage.text, amendCheckBox.checked)
                         statusModel.update()
+                        commitDialog.close()
                     }
                 }
             }

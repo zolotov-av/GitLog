@@ -5,30 +5,33 @@
 namespace git
 {
 
-    /**
-     * @brief Класс представляющий автора коммита
-     * @ingroup GitCXX
-     */
     class signature
     {
     private:
 
-        QString m_name;
-        QString m_mail;
-        git_time m_when;
+        git_signature *m_sig { nullptr };
 
     public:
 
-        signature(const git_signature *s):
-            m_name{QString::fromUtf8(s->name)},
-            m_mail{QString::fromUtf8(s->email)},
-            m_when(s->when)
-        {
-        }
+        explicit signature(git_signature *s = nullptr): m_sig{s} { }
+        signature(const signature &) = delete;
+        signature(signature &&other);
+        ~signature() { git_signature_free(m_sig); }
 
-        const QString& name() const { return m_name; }
-        const QString& mail() const { return m_mail; }
-        git_time when() const { return m_when; }
+        signature& operator = (const signature &) = delete;
+        signature& operator = (signature &&other);
+
+        static signature now(const QString &name, const QString &email);
+
+        bool isNull() const { return m_sig == nullptr; }
+
+        QString name() const { return QString::fromUtf8(m_sig->name); }
+        QString email() const { return QString::fromUtf8(m_sig->email); }
+        git_time when() const { return m_sig->when; }
+
+        git_signature* data() { return m_sig; }
+        const git_signature* data() const { return m_sig; }
+        const git_signature* constData() const { return m_sig; }
 
     };
 

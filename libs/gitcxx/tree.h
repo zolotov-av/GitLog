@@ -58,12 +58,9 @@ namespace git
 
         };
 
-        tree() = default;
+        explicit tree(git_tree *v = nullptr): m_tree{v} { }
         tree(const tree &) = delete;
         tree(tree &&other): m_tree(other.m_tree)
-        {
-        }
-        tree(git_tree *v): m_tree(v)
         {
         }
         tree(const commit &commit);
@@ -79,10 +76,8 @@ namespace git
         bool exists(const QString &path);
         entry entryByPath(const QString &path) const;
 
-        git_tree* data() const
-        {
-            return m_tree;
-        }
+        git_tree* data() const { return m_tree; }
+        const git_tree* constData() const { return m_tree; }
 
     };
 

@@ -1,4 +1,5 @@
 #include "index.h"
+#include "tree.h"
 
 namespace git
 {
@@ -47,6 +48,18 @@ namespace git
     void index::write()
     {
         check( git_index_write(m_index) );
+    }
+
+    void index::readTree(const tree &tree)
+    {
+        check( git_index_read_tree(m_index, tree.constData()));
+    }
+
+    object_id index::writeTree()
+    {
+        git_oid tree_id { };
+        check( git_index_write_tree(&tree_id, m_index) );
+        return object_id{ tree_id };
     }
 
 }

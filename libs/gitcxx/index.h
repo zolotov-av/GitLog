@@ -64,6 +64,14 @@ namespace git
          */
         void write();
 
+        void readTree(const tree &tree);
+
+        /**
+         * @brief Записать индекс в виде дерева
+         * @return OID записанного дерева
+         */
+        object_id writeTree();
+
         git_index* data() { return m_index; }
 
     };

@@ -3,6 +3,7 @@
 #include "common.h"
 #include "oid.h"
 #include "signature.h"
+#include "SignatureInfo.h"
 #include "tree.h"
 #include <QDateTime>
 
@@ -52,7 +53,7 @@ namespace git
             return git_commit_id(m_commit);
         }
 
-        signature author() const
+        SignatureInfo author() const
         {
             return git_commit_author(m_commit);
         }
@@ -73,10 +74,9 @@ namespace git
 
         tree commitTree();
 
-        const git_commit* data() const
-        {
-            return m_commit;
-        }
+        git_commit* data() { return m_commit; }
+        const git_commit* data() const { return m_commit; }
+        const git_commit* constData() const { return m_commit; }
 
     };
 

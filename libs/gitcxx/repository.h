@@ -79,6 +79,8 @@ namespace git
         commit lookupCommit(const QString &hash);
         commit lookupCommit(const git::reference &ref);
 
+        tree lookupTree(const object_id &oid);
+
         revwalk newRevwalk();
 
         reference createBranch(const QString &name, const git::commit &target, bool force = false);
@@ -133,7 +135,23 @@ namespace git
          */
         void removeFile(const QString &file);
 
+        signature signatureDefault();
+
         void createCommit(const QString &author_name, const QString &author_email, const QString &message);
+
+        /**
+         * @brief Сделать коммит
+         * @param message текстовое описание коммита
+         * @return OID созданного коммита
+         */
+        object_id createCommit(const QString &message);
+
+        /**
+         * @brief Исправить коммит
+         * @param message текстовое описание коммита
+         * @return OID исправленного коммита
+         */
+        object_id amendCommit(const QString &message);
 
         git_repository* data() const
         {
