@@ -69,6 +69,13 @@ namespace git
         return reference{ ref };
     }
 
+    reference::iterator repository::newReferenceRterator()
+    {
+        git_reference_iterator *iter { nullptr };
+        check( git_reference_iterator_new(&iter, m_repo) );
+        return reference::iterator{ iter };
+    }
+
     reference repository::lookupBranch(const QString &name, git_branch_t type)
     {
         const auto utf8_name = name.toUtf8();

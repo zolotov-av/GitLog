@@ -60,6 +60,8 @@ namespace git
 
         reference head();
 
+        reference::iterator newReferenceRterator();
+
         reference lookupBranch(const QString &name, git_branch_t type = GIT_BRANCH_LOCAL);
 
         reference lookupReference(const QString &name);

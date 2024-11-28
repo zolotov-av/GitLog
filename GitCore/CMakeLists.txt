@@ -43,6 +43,8 @@ qt_add_qml_module(GitCore
     SOURCES
         GitRepository.h
         GitRepository.cpp
+        GitFilesModel.h
+        GitFilesModel.cpp
         GitStatusModel.h
         GitStatusModel.cpp
         GraphItem.h

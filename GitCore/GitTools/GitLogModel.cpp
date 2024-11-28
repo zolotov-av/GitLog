@@ -205,23 +205,15 @@ void GitLogModel::clear()
 void GitLogModel::updateRefs()
 {
     m_refs.clear();
-    git_reference_iterator *iter;
-    int status = git_reference_iterator_new(&iter, repo->data());
-    if ( status == 0 )
+    auto iter = repo->newReferenceRterator();
+
+    while ( true )
     {
-        git_reference *ref;
+        auto ref = iter.next();
+        if ( ref.isNull() )
+            break;
 
-        while ( true )
-        {
-            status = git_reference_next(&ref, iter);
-            if ( status != 0 )
-            {
-                break;
-            }
-            m_refs.append(git::reference(ref));
-        }
-
-        git_reference_iterator_free(iter);
+        m_refs.append(std::move(ref));
     }
 }
 

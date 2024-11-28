@@ -3,12 +3,13 @@
 #include "common.h"
 #include "oid.h"
 #include "object.h"
+#include "reference_iterator.h"
 
 namespace git
 {
 
     /**
-     * @brief Класс представляющий ссылку (reference)
+     * @brief Класс представляющий ссылку (git_reference)
      * @ingroup GitCXX
      */
     class reference
@@ -18,6 +19,11 @@ namespace git
         git_reference *m_ref { nullptr };
 
     public:
+
+        /**
+         * Итератор ссылок
+         */
+        using iterator = reference_iterator;
 
         reference() = default;
         reference(const reference &other) = delete;
@@ -37,6 +43,8 @@ namespace git
 
         reference& operator = (const reference &) = delete;
         reference& operator = (reference &&other);
+
+        bool isNull() const { return m_ref == nullptr; }
 
         bool isHead() const
         {

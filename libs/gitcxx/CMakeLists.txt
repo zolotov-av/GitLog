@@ -42,6 +42,7 @@ add_library(gitcxx STATIC
     config.cpp
     repository.h
     repository.cpp
+    reference_iterator.h reference_iterator.cpp
 
 )
 add_library(git::cxx ALIAS gitcxx)

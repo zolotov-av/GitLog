@@ -20,6 +20,7 @@ add_subdirectory(GitCore)
 add_subdirectory(GitLog)
 add_subdirectory(GitDiff)
 add_subdirectory(GitStatus)
+add_subdirectory(GitBrowse)
 
 doxygen_add_docs(docs
     ${CMAKE_CURRENT_SOURCE_DIR}
