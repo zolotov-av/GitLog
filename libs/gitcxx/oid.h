@@ -38,8 +38,13 @@ namespace git
         object_id& operator = (object_id &&) = default;
         object_id& operator = (const git_oid *oid);
 
-        bool operator == (const object_id &o) const;
-        bool operator != (const object_id &o) const;
+        int compare(const object_id &other) const
+        {
+            return git_oid_cmp(&m_oid, &other.m_oid);
+        }
+
+        bool operator == (const object_id &other) const;
+        bool operator != (const object_id &other) const;
 
         bool isNull() const
         {

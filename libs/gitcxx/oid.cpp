@@ -21,14 +21,14 @@ namespace git
         return *this;
     }
 
-    bool object_id::operator == (const object_id &o) const
+    bool object_id::operator == (const object_id &other) const
     {
-        return memcmp(m_oid.id, o.m_oid.id, sizeof(m_oid.id)) == 0;
+        return compare(other) == 0;
     }
 
-    bool object_id::operator != (const object_id &o) const
+    bool object_id::operator != (const object_id &other) const
     {
-        return memcmp(m_oid.id, o.m_oid.id, sizeof(m_oid.id)) != 0;
+        return compare(other) != 0;
     }
 
     QString object_id::toString() const
