@@ -2,7 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlEngineExtensionPlugin>
 #include <QQmlContext>
-#include <GitTools/GitApplication.h>
+#include <GitApplication.h>
 #include "GitDiff.h"
 #include <awCore/thread.h>
 #include <awCore/trace.h>

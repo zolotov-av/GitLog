@@ -11,8 +11,6 @@ add_library(GitCore STATIC
     ReferenceInfo.cpp
     GitFileInfo.h
     GitFileInfo.cpp
-    GitTools/GitApplication.h
-    GitTools/GitApplication.cpp
     GitTools/RefsModel.h
     GitTools/RefsModel.cpp
     GitTools/CommitInfo.h
@@ -41,6 +39,8 @@ qt_add_qml_module(GitCore
         qml/CreateBranchDialog.qml
         qml/DeleteBranchDialog.qml
     SOURCES
+        GitApplication.h
+        GitApplication.cpp
         GitRepository.h
         GitRepository.cpp
         GitFilesModel.h

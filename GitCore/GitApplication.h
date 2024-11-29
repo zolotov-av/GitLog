@@ -1,5 +1,8 @@
 #pragma once
 
+#include <QAbstractItemModel>
+#include <QQmlEngine>
+
 /**
  * @brief Библиотека GitCore
  * @defgroup GitCore
@@ -11,11 +14,14 @@
  *
  * Инициализирует libgit2 и загружает QML-ресурсы
  */
-class GitApplication
+class GitApplication: public QObject
 {
+    Q_OBJECT
+    QML_ELEMENT
+
 public:
 
-    GitApplication();
+    explicit GitApplication(QObject *parent = nullptr);
     GitApplication(const GitApplication &) = delete;
     GitApplication(GitApplication &&) = delete;
     ~GitApplication();

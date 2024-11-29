@@ -3,7 +3,7 @@
 #include <QQmlEngineExtensionPlugin>
 #include "LogWindow.h"
 #include "DBusInterface.h"
-#include <GitTools/GitApplication.h>
+#include <GitApplication.h>
 
 Q_IMPORT_QML_PLUGIN(GitCorePlugin)
 
