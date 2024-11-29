@@ -26,7 +26,7 @@ private:
     git::repository *repo { nullptr };
 
     QVector<git::CommitInfo> history;
-    QList<git::reference_info> m_refs;
+    QList<ReferenceInfo> m_refs;
 
     void clear();
     void updateRefs();
@@ -44,7 +44,7 @@ public:
     GitLogModel& operator = (const GitLogModel &) = delete;
     GitLogModel& operator = (GitLogModel &&) = delete;
 
-    const QList<git::reference_info>& refs() const
+    const QList<ReferenceInfo>& refs() const
     {
         return m_refs;
     }

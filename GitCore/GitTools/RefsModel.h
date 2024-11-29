@@ -1,9 +1,9 @@
 #pragma once
 
+#include "ReferenceInfo.h"
 #include <QAbstractItemModel>
 #include <QList>
 #include <QColor>
-#include <GitTools/reference_info.h>
 #include <gitcxx/repository.h>
 
 class RefsModel final: public QAbstractItemModel
@@ -49,7 +49,7 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
     void clear();
-    void append(const git::reference_info &ref);
+    void append(const ReferenceInfo &ref);
 
     void loadBranches(git::repository *repo);
     void loadTags(git::repository *repo);

@@ -7,6 +7,8 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick)
 qt_standard_project_setup()
 
 add_library(GitCore STATIC
+    ReferenceInfo.h
+    ReferenceInfo.cpp
     GitFileInfo.h
     GitFileInfo.cpp
     GitTools/GitApplication.h
@@ -20,7 +22,6 @@ add_library(GitCore STATIC
     GitTools/CreateBranchDialog.cpp
     GitTools/GitCommitFiles.h
     GitTools/GitLogModel.h
-    GitTools/reference_info.h
     GitTools/GitCommitFiles.cpp
     GitTools/GitLogModel.cpp
     GitTools/DiffModel.h

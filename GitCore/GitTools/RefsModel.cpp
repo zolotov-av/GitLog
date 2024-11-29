@@ -93,7 +93,7 @@ void RefsModel::clear()
     endResetModel();
 }
 
-static const char* getRefType(const git::reference_info &ref)
+static const char* getRefType(const ReferenceInfo &ref)
 {
     if ( ref.isHead )
         return "HEAD";
@@ -107,7 +107,7 @@ static const char* getRefType(const git::reference_info &ref)
     return "other";
 }
 
-static QColor getRefColor(const git::reference_info &ref)
+static QColor getRefColor(const ReferenceInfo &ref)
 {
     const QColor GT_Green("#00B64F");
     const QColor GT_Red("#FF3500");
@@ -127,7 +127,7 @@ static QColor getRefColor(const git::reference_info &ref)
     return GT_Orange;
 }
 
-void RefsModel::append(const git::reference_info &ref)
+void RefsModel::append(const ReferenceInfo &ref)
 {
     m_refs.append({ref.short_name, getRefType(ref), getRefColor(ref)});
 }
