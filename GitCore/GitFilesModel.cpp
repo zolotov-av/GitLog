@@ -55,7 +55,8 @@ QVariant GitFilesModel::data(const QModelIndex &index, int role) const
     {
     case fileRole:
         return m_items.at(index.row()).fileName;
-        return QVariant{ };
+    case fileTypeRole:
+        return m_items.at(index.row()).fileType;
     default:
         return QVariant{ };
     }
@@ -64,7 +65,8 @@ QVariant GitFilesModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> GitFilesModel::roleNames() const
 {
     return {
-        {fileRole, "fileName"}
+        {fileRole, "fileName"},
+        {fileTypeRole, "fileType"}
     };
 }
 
@@ -86,19 +88,51 @@ void GitFilesModel::setRepository(GitRepository *r)
     update();
 }
 
+void GitFilesModel::setReferenceName(const QString &ref)
+{
+    if ( m_ref_name == ref )
+        return;
+
+    m_ref_name = ref;
+
+    emit referenceNameChanged();
+
+    update();
+}
+
+void GitFilesModel::clear()
+{
+    beginResetModel();
+
+    m_items.clear();
+
+    endResetModel();
+}
+
+static const char* entryTypeName(git_object_t fileType)
+{
+    switch(fileType)
+    {
+    case GIT_OBJECT_INVALID: return "invalid";
+    case GIT_OBJECT_COMMIT: return "commit";
+    case GIT_OBJECT_TREE: return "tree";
+    case GIT_OBJECT_BLOB: return "file";
+    case GIT_OBJECT_TAG: return "tag";
+    case GIT_OBJECT_OFS_DELTA: return "ofs_delta";
+    case GIT_OBJECT_REF_DELTA: return "ref_delta";
+    default: return "unknown";
+    }
+}
+
 void GitFilesModel::update()
 {
     aw::trace fn("GitFilesModel::update()");
 
-    if ( m_repo == nullptr || !m_repo->isOpened() )
+    if ( m_repo == nullptr || !m_repo->isOpened() || m_ref_name.isEmpty() )
     {
         aw::trace::log("GitFilesModel::update() not opened");
 
-        beginResetModel();
-
-        m_items.clear();
-
-        endResetModel();
+        clear();
         return;
     }
 
@@ -107,15 +141,17 @@ void GitFilesModel::update()
 
     m_items.clear();
 
-    auto iter = m_repo->newReferenceRterator();
+    const auto commit_id = m_repo->lookupReference(m_ref_name).resolve().target();
+    auto commit = m_repo->lookupCommit(commit_id);
+    auto tree = commit.commitTree();
 
-    while ( true )
+    const size_t count = tree.entryCount();
+    for(size_t i = 0; i < count; i++)
     {
-        auto ref = iter.next();
-        if ( ref.isNull() )
-            break;
-
-        m_items.append(FileInfo{ref.shortName()});
+        const auto entry = tree.entryByIndex(i);
+        const auto fileName = entry.name();
+        const auto fileType = entryTypeName(entry.type());
+        m_items.append(FileInfo{fileName, fileType});
     }
 
     endResetModel();

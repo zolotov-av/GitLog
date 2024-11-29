@@ -21,12 +21,14 @@ public:
     {
         RefNameRole = Qt::DisplayRole,
         RefColorRole = Qt::BackgroundRole,
-        RefTypeRole = Qt::UserRole
+        RefTypeRole = Qt::UserRole,
+        RefFullNameRole
     };
 
     struct Item
     {
         QString refName;
+        QString refFullName;
         const char *refType;
         QColor refColor;
     };

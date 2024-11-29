@@ -65,6 +65,7 @@ namespace git
         reference lookupBranch(const QString &name, git_branch_t type = GIT_BRANCH_LOCAL);
 
         reference lookupReference(const QString &name);
+        reference lookupReferenceDwim(const QString &shortName);
 
         blob lookupBlob(const git_oid *id);
         blob lookupBlob(const object_id &oid)

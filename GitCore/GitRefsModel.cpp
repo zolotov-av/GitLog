@@ -68,6 +68,8 @@ QVariant GitRefsModel::data(const QModelIndex &index, int role) const
     {
     case RefNameRole:
         return m_refs[index.row()].refName;
+    case RefFullNameRole:
+        return m_refs[index.row()].refFullName;
     case RefColorRole:
         return m_refs[index.row()].refColor;
     case RefTypeRole:
@@ -81,6 +83,7 @@ QHash<int, QByteArray> GitRefsModel::roleNames() const
 {
     return {
         {RefNameRole, "refName"},
+        {RefFullNameRole, "refFullName"},
         {RefColorRole, "refColor"},
         {RefTypeRole, "refType"}
     };
@@ -147,7 +150,7 @@ static QColor getRefColor(const ReferenceInfo &ref)
 
 void GitRefsModel::append(const ReferenceInfo &ref)
 {
-    m_refs.append({ref.short_name, getRefType(ref), getRefColor(ref)});
+    m_refs.append({ref.short_name, ref.name, getRefType(ref), getRefColor(ref)});
 }
 
 void GitRefsModel::loadBranches(git::repository *repo)

@@ -11,23 +11,26 @@ class GitFilesModel: public QAbstractItemModel
     QML_ELEMENT
 
     Q_PROPERTY(GitRepository* repository READ repository WRITE setRepository NOTIFY repositoryChanged FINAL)
+    Q_PROPERTY(QString referenceName READ referenceName WRITE setReferenceName NOTIFY referenceNameChanged FINAL)
 
 public:
 
     enum Roles
     {
-        fileRole = Qt::DisplayRole
+        fileRole = Qt::DisplayRole,
+        fileTypeRole = Qt::UserRole
     };
 
     struct FileInfo
     {
         QString fileName { };
+        QString fileType { };
     };
 
 private:
 
     GitRepository *m_repo { nullptr };
-    git::reference m_ref { };
+    QString m_ref_name { };
     QList<FileInfo> m_items { };
 
 public:
@@ -51,10 +54,17 @@ public:
     GitRepository* repository() { return m_repo; }
     void setRepository(GitRepository *r);
 
-    Q_INVOKABLE void update();
+    const QString& referenceName() const { return m_ref_name; }
+    void setReferenceName(const QString &ref);
+
+public slots:
+
+    void clear();
+    void update();
 
 signals:
 
     void repositoryChanged();
+    void referenceNameChanged();
 
 };

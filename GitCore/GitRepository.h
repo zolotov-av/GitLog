@@ -50,6 +50,9 @@ public:
 
     git::revwalk newRevwalk() { return m_repo.newRevwalk(); }
 
+    git::reference lookupReference(const QString &refName) { return m_repo.lookupReference(refName); }
+    git::reference lookupReferenceDwim(const QString &shortName) { return m_repo.lookupReferenceDwim(shortName); }
+
     git::commit lookupCommit(const git_oid *id) { return m_repo.lookupCommit(id); }
     git::commit lookupCommit(const git::object_id &oid) { return m_repo.lookupCommit(oid); }
     git::commit lookupCommit(const QString &hash) { return m_repo.lookupCommit(hash); }

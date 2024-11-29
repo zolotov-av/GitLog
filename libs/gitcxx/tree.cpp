@@ -13,6 +13,27 @@ namespace git
         return *this;
     }
 
+    QString tree::const_entry::name() const
+    {
+        return QString::fromUtf8(git_tree_entry_name(m_entry));
+    }
+
+    QString tree::const_entry::typeName() const
+    {
+        switch( git_tree_entry_type(m_entry) )
+        {
+        case GIT_OBJECT_ANY: return "any";
+        case GIT_OBJECT_INVALID: return "invalid";
+        case GIT_OBJECT_COMMIT: return "commit";
+        case GIT_OBJECT_TREE: return "tree";
+        case GIT_OBJECT_BLOB: return "blob";
+        case GIT_OBJECT_TAG: return "tag";
+        case GIT_OBJECT_OFS_DELTA: return "ofs_delta";
+        case GIT_OBJECT_REF_DELTA: return "ref_delta";
+        default: return "unknown";
+        }
+    }
+
     QString tree::entry::name() const
     {
         return QString::fromUtf8(git_tree_entry_name(m_entry));

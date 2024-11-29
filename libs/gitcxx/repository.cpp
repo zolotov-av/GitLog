@@ -92,6 +92,14 @@ namespace git
         return reference{ ref };
     }
 
+    reference repository::lookupReferenceDwim(const QString &shortName)
+    {
+        const auto utf8_name = shortName.toUtf8();
+        git_reference *ref { nullptr };
+        check( git_reference_dwim(&ref, m_repo, utf8_name.constData()) );
+        return reference{ ref };
+    }
+
     blob repository::lookupBlob(const git_oid *id)
     {
         git_blob *b { nullptr };

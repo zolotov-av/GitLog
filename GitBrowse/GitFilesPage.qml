@@ -2,21 +2,73 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import GitCore
+import Browse
 
 ColumnLayout {
 
+    spacing: 0
+
+    required property string refName
+    required property string path
+
     Component.onCompleted: {
-        refsModel.update();
+        filesModel.update();
     }
 
-    GitRefsModel {
-        id: refsModel
+    GitFilesModel {
+        id: filesModel
         repository: gitRepo
+        referenceName: refName
+    }
+
+    function handleKeys(event)
+    {
+        if (event.modifiers !== 0)
+            return;
+
+        switch (event.key )
+        {
+        case Qt.Key_Backspace:
+            console.log("GitFilesPage Qt.Key_Backspace pressed");
+            stackView.pop()
+            event.accepted = true
+            break;
+        }
+    }
+
+    Keys.onPressed: event => handleKeys(event)
+
+    Rectangle {
+        id: header
+        implicitHeight: headerLayout.implicitHeight + rowLayout.anchors.margins * 2
+        color: "burlywood"
+        Layout.fillWidth: true
+
+        RowLayout {
+            id: headerLayout
+            anchors.fill: parent
+            anchors.margins: 8
+            spacing: 26
+
+            Label {
+                text: "ref: " + refName
+            }
+
+            Label {
+                text: "path: " + path
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+        }
+
     }
 
     ListView {
         id: listView
-        model: refsModel
+        model: filesModel
         activeFocusOnTab: true
         Layout.fillWidth: true
         Layout.fillHeight: true
@@ -30,7 +82,7 @@ ColumnLayout {
 
         function gitUpdate() {
             console.log("gitUpdate")
-            refsModel.update();
+            filesModel.update();
         }
 
         function handleKeys(event)
@@ -53,28 +105,17 @@ ColumnLayout {
         delegate: Item {
 
             id: item
-            implicitHeight: txt.implicitHeight + 4
+            implicitHeight: txt.implicitHeight
             implicitWidth: listView.width
 
             required property int index
-            required property string refName
-            required property string refFullName
-            required property color refColor
-
-            Rectangle {
-                x: 4
-                y: 1
-                width: txt.implicitWidth + 4
-                height: parent.height - 2
-                color: refColor
-                border.color: "black"
-                border.width: 1
-            }
+            required property string fileName
+            required property string fileType
 
             Label {
                 id: txt
-                x: 6
-                text: item.refName
+                text: item.fileName
+                font.bold: (item.fileType === "tree")
             }
 
             MouseArea {
@@ -83,10 +124,17 @@ ColumnLayout {
                     listView.currentIndex = item.index;
                     listView.forceActiveFocus();
                 }
+            }
 
-                onDoubleClicked: {
-                    listView.currentIndex = item.index;
-                    stackView.push("GitFilesPage.qml", {"refName" : item.refFullName, "path": "/"})
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.RightButton
+                onClicked: (mouse) => {
+                    listView.currentIndex = item.index
+                    var pos = item.mapToItem(listView, mouse.x, mouse.y)
+                    contextMenu.x = pos.x
+                    contextMenu.y = pos.y
+                    contextMenu.open()
                 }
             }
         }
@@ -161,4 +209,5 @@ ColumnLayout {
         }
 
     }
+
 }

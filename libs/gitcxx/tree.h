@@ -23,6 +23,35 @@ namespace git
 
     public:
 
+        class const_entry
+        {
+        private:
+
+            const git_tree_entry *m_entry { nullptr };
+
+        public:
+
+            constexpr const_entry(const git_tree_entry *ent = nullptr): m_entry{ent} { }
+            const_entry(const const_entry &) = default;
+            const_entry(const_entry &&) = default;
+            ~const_entry() = default;
+
+            const_entry& operator = (const const_entry &) = default;
+            const_entry& operator = (const_entry &&) = default;
+
+            constexpr bool isNull() const { return m_entry == nullptr; }
+
+            object_id id() const
+            {
+                return object_id{ git_tree_entry_id(m_entry) };
+            }
+
+            QString name() const;
+            git_object_t type() const { return git_tree_entry_type(m_entry); }
+            QString typeName() const;
+
+        };
+
         class entry
         {
         private:
@@ -72,6 +101,16 @@ namespace git
 
         tree& operator = (const tree &) = delete;
         tree& operator = (tree &&other);
+
+        size_t entryCount() const
+        {
+            return git_tree_entrycount(m_tree);
+        }
+
+        const_entry entryByIndex(size_t index) const
+        {
+            return const_entry{ git_tree_entry_byindex(m_tree, index) };
+        }
 
         bool exists(const QString &path);
         entry entryByPath(const QString &path) const;
