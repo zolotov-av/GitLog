@@ -2,7 +2,7 @@
 #define GT_COMMIT_INFO_H
 
 #include <QVector>
-#include "RefsModel.h"
+#include "../GitRefsModel.h"
 #include <QRegularExpression>
 
 namespace git
@@ -55,7 +55,7 @@ namespace git
         QString m_message;
         QString m_author_name;
         QDateTime m_commit_time;
-        RefsModel m_refs_model;
+        GitRefsModel m_refs_model;
 
     public:
 
@@ -156,9 +156,9 @@ namespace git
             return commit.childOf(*this);
         }
 
-        RefsModel* refsModel() const
+        GitRefsModel* refsModel() const
         {
-            return const_cast<RefsModel*>(&m_refs_model);
+            return const_cast<GitRefsModel*>(&m_refs_model);
         }
 
     };

@@ -118,6 +118,7 @@ public:
 signals:
 
     void pathChanged();
+    void stateChanged();
     void errorOccurred(const QString &message);
 
 };

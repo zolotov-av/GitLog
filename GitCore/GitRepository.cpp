@@ -32,12 +32,16 @@ void GitRepository::open()
 {
     const aw::trace fn("GitRepository::open()");
     m_repo.open(m_path);
+
+    emit stateChanged();
 }
 
 void GitRepository::close()
 {
     const aw::trace fn("GitRepository::close()");
     m_repo.close();
+
+    emit stateChanged();
 }
 
 void GitRepository::stageAll(const QString &path, unsigned int flags)

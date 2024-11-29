@@ -3,7 +3,7 @@
 #include "QuickDialog.h"
 #include <QQmlEngine>
 #include <GitTools/GitLogModel.h>
-#include <GitTools/RefsModel.h>
+#include "../GitRefsModel.h"
 
 class CreateBranchDialog: public QuickDialog
 {
@@ -15,8 +15,8 @@ class CreateBranchDialog: public QuickDialog
 private:
 
     git::object_id commit_id { };
-    RefsModel m_branches { this };
-    RefsModel m_tags { this };
+    GitRefsModel m_branches { this };
+    GitRefsModel m_tags { this };
 
 public:
 

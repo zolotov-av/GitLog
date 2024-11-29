@@ -1,50 +1,50 @@
-#include "RefsModel.h"
+#include "GitRefsModel.h"
 
-RefsModel::RefsModel(QObject *parent): QAbstractItemModel{parent}
+GitRefsModel::GitRefsModel(QObject *parent): QAbstractItemModel{parent}
 {
 
 }
 
-RefsModel::RefsModel(const RefsModel &other):
+GitRefsModel::GitRefsModel(const GitRefsModel &other):
     QAbstractItemModel{nullptr}, m_refs(other.m_refs)
 {
 
 }
 
-RefsModel::RefsModel(RefsModel &&other):
+GitRefsModel::GitRefsModel(GitRefsModel &&other):
     QAbstractItemModel{nullptr}, m_refs(other.m_refs)
 {
 
 }
 
-RefsModel::~RefsModel()
+GitRefsModel::~GitRefsModel()
 {
 
 }
 
-RefsModel& RefsModel::operator = (const RefsModel &other)
+GitRefsModel& GitRefsModel::operator = (const GitRefsModel &other)
 {
     m_refs = other.m_refs;
     return *this;
 }
 
-RefsModel& RefsModel::operator = (RefsModel &&other)
+GitRefsModel& GitRefsModel::operator = (GitRefsModel &&other)
 {
     m_refs = std::move(other.m_refs);
     return *this;
 }
 
-int RefsModel::rowCount(const QModelIndex &parent) const
+int GitRefsModel::rowCount(const QModelIndex &parent) const
 {
     return m_refs.size();
 }
 
-int RefsModel::columnCount(const QModelIndex &parent) const
+int GitRefsModel::columnCount(const QModelIndex &parent) const
 {
     return 1;
 }
 
-QModelIndex RefsModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex GitRefsModel::index(int row, int column, const QModelIndex &parent) const
 {
     if ( !parent.isValid() )
     {
@@ -54,12 +54,12 @@ QModelIndex RefsModel::index(int row, int column, const QModelIndex &parent) con
     return QModelIndex{ };
 }
 
-QModelIndex RefsModel::parent(const QModelIndex &child) const
+QModelIndex GitRefsModel::parent(const QModelIndex &child) const
 {
     return QModelIndex{ };
 }
 
-QVariant RefsModel::data(const QModelIndex &index, int role) const
+QVariant GitRefsModel::data(const QModelIndex &index, int role) const
 {
     if ( !index.isValid() || index.row() < 0 || index.row() >= m_refs.size() || index.column() != 0 )
         return { };
@@ -77,7 +77,7 @@ QVariant RefsModel::data(const QModelIndex &index, int role) const
     }
 }
 
-QHash<int, QByteArray> RefsModel::roleNames() const
+QHash<int, QByteArray> GitRefsModel::roleNames() const
 {
     return {
         {RefNameRole, "refName"},
@@ -86,7 +86,25 @@ QHash<int, QByteArray> RefsModel::roleNames() const
     };
 }
 
-void RefsModel::clear()
+void GitRefsModel::setRepository(GitRepository *r)
+{
+    if ( m_repo == r )
+        return;
+
+    if ( m_repo )
+        disconnect(m_repo, &GitRepository::stateChanged, this, &GitRefsModel::update);
+
+    m_repo = r;
+
+    if ( m_repo )
+        connect(m_repo, &GitRepository::stateChanged, this, &GitRefsModel::update);
+
+    emit repositoryChanged();
+
+    update();
+}
+
+void GitRefsModel::clear()
 {
     beginResetModel();
     m_refs.clear();
@@ -127,12 +145,12 @@ static QColor getRefColor(const ReferenceInfo &ref)
     return GT_Orange;
 }
 
-void RefsModel::append(const ReferenceInfo &ref)
+void GitRefsModel::append(const ReferenceInfo &ref)
 {
     m_refs.append({ref.short_name, getRefType(ref), getRefColor(ref)});
 }
 
-void RefsModel::loadBranches(git::repository *repo)
+void GitRefsModel::loadBranches(git::repository *repo)
 {
     beginResetModel();
 
@@ -163,7 +181,7 @@ void RefsModel::loadBranches(git::repository *repo)
     endResetModel();
 }
 
-void RefsModel::loadTags(git::repository *repo)
+void GitRefsModel::loadTags(git::repository *repo)
 {
     beginResetModel();
 
@@ -191,6 +209,31 @@ void RefsModel::loadTags(git::repository *repo)
 
             git_reference_iterator_free(iter);
         }
+    }
+
+    endResetModel();
+}
+
+void GitRefsModel::update()
+{
+    if ( m_repo == nullptr || !m_repo->isOpened() )
+    {
+        clear();
+        return;
+    }
+
+    beginResetModel();
+
+    m_refs.clear();
+
+    auto iter = m_repo->newReferenceRterator();
+    while ( true )
+    {
+        auto ref = iter.next();
+        if ( ref.isNull() )
+            break;
+
+        append(std::move(ref));
     }
 
     endResetModel();

@@ -14,6 +14,7 @@ qt_add_qml_module(GitBrowse
     URI Browse
     VERSION 1.0
     QML_FILES
+        GitRefsPage.qml
         GitBrowse.qml
     DEPENDENCIES
         GitCore

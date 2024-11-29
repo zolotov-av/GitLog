@@ -11,8 +11,6 @@ add_library(GitCore STATIC
     ReferenceInfo.cpp
     GitFileInfo.h
     GitFileInfo.cpp
-    GitTools/RefsModel.h
-    GitTools/RefsModel.cpp
     GitTools/CommitInfo.h
     GitTools/QuickDialog.h
     GitTools/QuickDialog.cpp
@@ -43,6 +41,8 @@ qt_add_qml_module(GitCore
         GitApplication.cpp
         GitRepository.h
         GitRepository.cpp
+        GitRefsModel.h
+        GitRefsModel.cpp
         GitFilesModel.h
         GitFilesModel.cpp
         GitStatusModel.h

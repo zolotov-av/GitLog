@@ -73,7 +73,13 @@ void GitFilesModel::setRepository(GitRepository *r)
     if ( m_repo == r )
         return;
 
+    if ( m_repo )
+        disconnect(m_repo, &GitRepository::stateChanged, this, &GitFilesModel::update);
+
     m_repo = r;
+
+    if ( m_repo )
+        connect(m_repo, &GitRepository::stateChanged, this, &GitFilesModel::update);
 
     emit repositoryChanged();
 
