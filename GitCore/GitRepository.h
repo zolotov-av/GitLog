@@ -58,6 +58,8 @@ public:
     git::commit lookupCommit(const QString &hash) { return m_repo.lookupCommit(hash); }
     git::commit lookupCommit(const git::reference &ref) { return m_repo.lookupCommit(ref.resolve().target()); }
 
+    git::tree lookupTree(const git::object_id &oid) { return m_repo.lookupTree(oid); }
+
     /**
      * @brief Добавить файл/каталог в индекс
      * @param path путь к файлу (относительно рабочего каталога)

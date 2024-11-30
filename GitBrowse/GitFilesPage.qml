@@ -5,11 +5,12 @@ import GitCore
 import Browse
 
 ColumnLayout {
+    id: root
 
     spacing: 0
 
     required property string refName
-    required property string path
+    required property string filePath
 
     Component.onCompleted: {
         filesModel.update();
@@ -18,7 +19,8 @@ ColumnLayout {
     GitFilesModel {
         id: filesModel
         repository: gitRepo
-        referenceName: refName
+        referenceName: root.refName
+        filePath: root.filePath
     }
 
     function handleKeys(event)
@@ -55,7 +57,7 @@ ColumnLayout {
             }
 
             Label {
-                text: "path: " + path
+                text: "path: " + filePath
             }
 
             Item {
@@ -123,6 +125,36 @@ ColumnLayout {
                 onClicked: {
                     listView.currentIndex = item.index;
                     listView.forceActiveFocus();
+                }
+
+                onDoubleClicked: {
+                    if ( item.fileType == "up" ) {
+                        if ( root.filePath=="/" ) {
+                            stackView.pop()
+                            return
+                        }
+
+                        var path = root.filePath.substring(1)
+                        var pos = path.indexOf("/")
+                        if ( pos < 0 ) {
+                            root.filePath = "/"
+                            return
+                        }
+
+                        root.filePath = "/" + path.substring(0, pos)
+                        return
+
+                    }
+                    if ( item.fileType != "tree" )
+                        return
+
+                    if ( root.filePath == "/" )
+                        root.filePath = "/" + item.fileName;
+                    else
+                        root.filePath = root.filePath + "/" + item.fileName;
+
+                    //? listView.currentIndex = 0;
+                    //? listView.forceActiveFocus();
                 }
             }
 

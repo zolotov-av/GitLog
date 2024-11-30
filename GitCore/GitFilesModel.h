@@ -12,6 +12,7 @@ class GitFilesModel: public QAbstractItemModel
 
     Q_PROPERTY(GitRepository* repository READ repository WRITE setRepository NOTIFY repositoryChanged FINAL)
     Q_PROPERTY(QString referenceName READ referenceName WRITE setReferenceName NOTIFY referenceNameChanged FINAL)
+    Q_PROPERTY(QString filePath READ filePath WRITE setFilePath NOTIFY filePathChanged FINAL)
 
 public:
 
@@ -31,6 +32,7 @@ private:
 
     GitRepository *m_repo { nullptr };
     QString m_ref_name { };
+    QString m_file_path { };
     QVector<FileInfo> m_items { };
 
 public:
@@ -57,6 +59,9 @@ public:
     const QString& referenceName() const { return m_ref_name; }
     void setReferenceName(const QString &ref);
 
+    const QString& filePath() const { return m_file_path; }
+    void setFilePath(const QString &path);
+
 private:
 
     void readTree(const git::tree &tree);
@@ -70,5 +75,6 @@ signals:
 
     void repositoryChanged();
     void referenceNameChanged();
+    void filePathChanged();
 
 };

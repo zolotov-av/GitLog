@@ -1,4 +1,5 @@
 #include "GitFilesModel.h"
+#include <gitcxx/exception.h>
 #include "awCore/trace.h"
 
 GitFilesModel::GitFilesModel(QObject *parent): QAbstractItemModel{parent}
@@ -100,6 +101,18 @@ void GitFilesModel::setReferenceName(const QString &ref)
     update();
 }
 
+void GitFilesModel::setFilePath(const QString &path)
+{
+    if ( m_file_path == path )
+        return;
+
+    m_file_path = path;
+
+    emit filePathChanged();
+
+    update();
+}
+
 namespace
 {
 
@@ -164,12 +177,46 @@ namespace
         return list;
     }
 
+    static git::tree appyPath(GitRepository *repo, git::tree &&tree, const QString &path)
+    {
+        if ( path.isEmpty() || path == QChar('/') )
+            return std::move(tree);
+
+        if( path.at(0) != QChar{'/'} )
+            return std::move(tree);
+
+        QStringView rest = QStringView{ path }.mid(1);
+
+        while ( true )
+        {
+
+            const auto pos = rest.indexOf(QChar('/'));
+            if ( pos < 0 )
+            {
+                const auto entry = tree.entryByPath(rest.toString());
+                if ( entry.type() != GIT_OBJECT_TREE )
+                    throw git::exception("%s is not directory", path);
+
+                return repo->lookupTree(entry.id());
+            }
+
+            const auto entry = tree.entryByPath(rest.mid(0, pos).toString());
+            if ( entry.type() != GIT_OBJECT_TREE )
+                throw git::exception("%s is not directory", path);
+
+            tree = repo->lookupTree(entry.id());
+            rest = rest.mid(pos + 1);
+        }
+
+        return std::move(tree);
+    }
 }
 
 void GitFilesModel::readTree(const git::tree &tree)
 {
     const auto entries = treeEntries(tree);
-    m_items.reserve(entries.size());
+    m_items.reserve(entries.size() + 1);
+    m_items.append(FileInfo{"..", "up"});
     for(const auto &item : entries)
     {
         m_items.append(FileInfo{item.fileName, item.fileType});
@@ -206,7 +253,7 @@ void GitFilesModel::update()
     {
         const auto commit_id = m_repo->lookupReference(m_ref_name).resolve().target();
         const auto commit = m_repo->lookupCommit(commit_id);
-        const auto tree = commit.commitTree();
+        const auto tree = appyPath(m_repo, commit.commitTree(), m_file_path);
 
         readTree(tree);
     }

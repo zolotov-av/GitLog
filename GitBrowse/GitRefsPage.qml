@@ -86,7 +86,7 @@ ColumnLayout {
 
                 onDoubleClicked: {
                     listView.currentIndex = item.index;
-                    stackView.push("GitFilesPage.qml", {"refName" : item.refFullName, "path": "/"})
+                    stackView.push("GitFilesPage.qml", {"refName" : item.refFullName, "filePath": "/"})
                 }
             }
         }

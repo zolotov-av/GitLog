@@ -86,6 +86,7 @@ namespace git
             }
 
             QString name() const;
+            git_object_t type() const { return git_tree_entry_type(m_entry); }
 
         };
 
