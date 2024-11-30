@@ -50,6 +50,8 @@ namespace git
             git_object_t type() const { return git_tree_entry_type(m_entry); }
             QString typeName() const;
 
+            const git_tree_entry* data() const { return m_entry; }
+            const git_tree_entry* constData() const { return m_entry; }
         };
 
         class entry

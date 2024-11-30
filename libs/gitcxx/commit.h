@@ -72,7 +72,7 @@ namespace git
             return git_commit_parent_id(m_commit, n);
         }
 
-        tree commitTree();
+        tree commitTree() const;
 
         git_commit* data() { return m_commit; }
         const git_commit* data() const { return m_commit; }

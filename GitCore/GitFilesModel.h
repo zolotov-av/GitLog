@@ -31,7 +31,7 @@ private:
 
     GitRepository *m_repo { nullptr };
     QString m_ref_name { };
-    QList<FileInfo> m_items { };
+    QVector<FileInfo> m_items { };
 
 public:
 
@@ -56,6 +56,10 @@ public:
 
     const QString& referenceName() const { return m_ref_name; }
     void setReferenceName(const QString &ref);
+
+private:
+
+    void readTree(const git::tree &tree);
 
 public slots:
 
