@@ -111,11 +111,16 @@ void GitStatusModel::update()
     constexpr QColor cachedColor{0x18, 0xb2, 0x18};
     constexpr QColor modifiedColor{0xb2, 0x18, 0x18};
     constexpr QColor untrackedColor{0x35, 0x35, 0x35};
+    constexpr QColor conflictedColor{0xFF, 0x98, 0x00};
 
     unsigned deltaCount = diffCached.deltaCount();
     for(unsigned i = 0; i < deltaCount; i++)
     {
-        m_items.append(diffCached.get_delta(i));
+        const auto delta = diffCached.get_delta(i);
+        if ( delta.type() == GIT_DELTA_CONFLICTED )
+            continue;
+
+        m_items.append(delta);
         m_colors.append(cachedColor);
     }
 
@@ -123,8 +128,31 @@ void GitStatusModel::update()
     for(unsigned i = 0; i < deltaCount; i++)
     {
         const auto delta = diffWorktree.get_delta(i);
+        if ( delta.type() == GIT_DELTA_UNTRACKED || delta.type() == GIT_DELTA_CONFLICTED )
+            continue;
+
         m_items.append(delta);
-        m_colors.append( delta.type() == GIT_DELTA_UNTRACKED ? untrackedColor : modifiedColor );
+        m_colors.append(modifiedColor);
+    }
+
+    for(unsigned i = 0; i < deltaCount; i++)
+    {
+        const auto delta = diffWorktree.get_delta(i);
+        if ( delta.type() != GIT_DELTA_CONFLICTED )
+            continue;
+
+        m_items.append(delta);
+        m_colors.append(conflictedColor);
+    }
+
+    for(unsigned i = 0; i < deltaCount; i++)
+    {
+        const auto delta = diffWorktree.get_delta(i);
+        if ( delta.type() != GIT_DELTA_UNTRACKED )
+            continue;
+
+        m_items.append(delta);
+        m_colors.append(untrackedColor);
     }
 
     endResetModel();

@@ -21,6 +21,12 @@ QString GitFileInfo::getFilePath(const git::diff_delta &delta)
     case GIT_DELTA_MODIFIED:
     case GIT_DELTA_RENAMED:
         return delta.oldFile().path();
+    case GIT_DELTA_CONFLICTED:
+    case GIT_DELTA_UNREADABLE:
+        if ( !delta.oldFile().path().isEmpty() )
+            return delta.oldFile().path();
+        if ( !delta.newFile().path().isEmpty() )
+            return delta.newFile().path();
     default:
         return "N/A";
     }
@@ -46,6 +52,10 @@ const char *GitFileInfo::getFileStatus(git_delta_t status)
         return "untracked";
     case GIT_DELTA_TYPECHANGE:
         return "typechange";
+    case GIT_DELTA_CONFLICTED:
+        return "conflicted";
+    case GIT_DELTA_UNREADABLE:
+        return "unreadable";
     default:
         return "unknown";
     }

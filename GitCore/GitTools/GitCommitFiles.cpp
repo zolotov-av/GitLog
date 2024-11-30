@@ -88,6 +88,10 @@ QVariant GitCommitFiles::GetDiffStatus(int index) const
         return "untracked";
     case GIT_DELTA_TYPECHANGE:
         return "typechange";
+    case GIT_DELTA_UNREADABLE:
+        return "unreadable";
+    case GIT_DELTA_CONFLICTED:
+        return "conflicted";
     default:
         return "unknown";
     }
@@ -109,6 +113,12 @@ QString GitCommitFiles::GetDiffPath(int index) const
     case GIT_DELTA_MODIFIED:
     case GIT_DELTA_RENAMED:
         return delta.oldFile().path();
+    case GIT_DELTA_UNREADABLE:
+    case GIT_DELTA_CONFLICTED:
+        if ( !delta.oldFile().path().isEmpty() )
+            return delta.oldFile().path();
+        if ( !delta.newFile().path().isEmpty() )
+            return delta.newFile().path();
     default:
         return QStringLiteral("N/A");
     }
@@ -162,6 +172,7 @@ QVariant GitCommitFiles::data(const QModelIndex &index, int role) const
         case GIT_DELTA_DELETED: return QColor(Qt::darkRed);
         case GIT_DELTA_MODIFIED:
         case GIT_DELTA_ADDED: return QColor(Qt::blue);
+        case GIT_DELTA_CONFLICTED: return QColor{Qt::darkRed};
         default: return QColor(Qt::black);
         }
     }
