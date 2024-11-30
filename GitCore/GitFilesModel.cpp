@@ -98,6 +98,26 @@ void GitFilesModel::setReferenceName(const QString &ref)
 
     m_ref_name = ref;
 
+    if ( m_repo )
+    {
+        try
+        {
+            const auto ref = m_repo->lookupReference(m_ref_name);
+            m_ref_short_name = ref.shortName();
+            m_commit_title = m_repo->lookupCommit(ref).shortMessage();
+        }
+        catch(const std::exception &e)
+        {
+            aw::trace::log("GitFilesModel::setReferenceName() warn: %s", e.what());
+            m_ref_short_name = ref;
+            m_commit_title.clear();
+        }
+    }
+    else
+    {
+        m_ref_short_name = ref;
+    }
+
     emit referenceNameChanged();
 
     update();

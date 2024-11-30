@@ -6,7 +6,6 @@ import Browse
 
 ColumnLayout {
     id: root
-
     spacing: 0
 
     required property string refName
@@ -39,11 +38,16 @@ ColumnLayout {
             spacing: 26
 
             Label {
-                text: "ref: " + refName
+                text: filesModel.filePath
             }
 
             Label {
-                text: "path: " + filesModel.filePath
+                text: "@ " + filesModel.referenceShortName
+            }
+
+            Label {
+                text: filesModel.commitTitle
+                font.italic: true
             }
 
             Item {

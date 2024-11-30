@@ -4,6 +4,8 @@ import QtQuick.Controls
 import GitCore
 
 ColumnLayout {
+    id: root
+    spacing: 0
 
     Component.onCompleted: {
         refsModel.update();
@@ -17,6 +19,30 @@ ColumnLayout {
     GitRefsModel {
         id: refsModel
         repository: gitRepo
+    }
+
+    Rectangle {
+        id: header
+        implicitHeight: headerLayout.implicitHeight + rowLayout.anchors.margins * 2
+        color: "burlywood"
+        Layout.fillWidth: true
+
+        RowLayout {
+            id: headerLayout
+            anchors.fill: parent
+            anchors.margins: 8
+            spacing: 26
+
+            Label {
+                text: qsTr("Refs")
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+        }
+
     }
 
     ListView {
