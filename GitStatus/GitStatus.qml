@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import GitCore
-import Status
 
 ApplicationWindow {
     id: root
@@ -12,8 +11,6 @@ ApplicationWindow {
     height: 800
 
     font.pixelSize: 20
-
-    property GitStatus status;
 
     Component.onCompleted: {
         statusModel.repository.open()
