@@ -1,6 +1,8 @@
 #include "GitFilesModel.h"
 #include <gitcxx/exception.h>
 #include "awCore/trace.h"
+#include <QDir>
+#include <QFileInfo>
 
 GitFilesModel::GitFilesModel(QObject *parent): QAbstractItemModel{parent}
 {
@@ -111,6 +113,18 @@ void GitFilesModel::setFilePath(const QString &path)
     emit filePathChanged();
 
     update();
+}
+
+int GitFilesModel::indexOf(const QString &file)
+{
+    const int count = m_items.size();
+    for(int i = 0; i < count; i++)
+    {
+        if ( file == m_items.at(i).fileName )
+            return i;
+    }
+
+    return -1;
 }
 
 namespace
@@ -263,4 +277,45 @@ void GitFilesModel::update()
     }
 
     endResetModel();
+}
+
+void GitFilesModel::enter(const QString &file)
+{
+    aw::trace::log("GitFilesModel::enter(%s)", file);
+    try
+    {
+        const auto newPath = QDir{m_file_path}.filePath(file);
+        const auto commit_id = m_repo->lookupReference(m_ref_name).resolve().target();
+        const auto commit = m_repo->lookupCommit(commit_id);
+        const auto tree = appyPath(m_repo, commit.commitTree(), newPath);
+
+        m_file_path = newPath;
+        aw::trace::log("GitFilesModel::enter() new path=%s", newPath);
+
+        emit filePathChanged();
+    }
+    catch(const std::exception &e)
+    {
+        aw::trace::log("GitFilesModel::enter() error: %s", e.what());
+    }
+
+    update();
+}
+
+int GitFilesModel::leave()
+{
+    aw::trace::log("GitFilesModel::leave() current path=%s", m_file_path);
+
+    if ( m_file_path == "/" || m_file_path.isEmpty() )
+        return 0;
+
+    const QFileInfo info{m_file_path};
+    m_file_path = info.dir().path();
+    aw::trace::log("GitFilesModel::leave() new path=%s", m_file_path);
+
+    emit filePathChanged();
+
+    update();
+
+    return indexOf(info.fileName());
 }

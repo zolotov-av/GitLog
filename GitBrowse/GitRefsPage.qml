@@ -7,6 +7,11 @@ ColumnLayout {
 
     Component.onCompleted: {
         refsModel.update();
+        listView.currentIndex = 0
+    }
+
+    StackView.onActivated: {
+        listView.forceActiveFocus()
     }
 
     GitRefsModel {
@@ -21,10 +26,9 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
 
-        function gitMenu() {
+        function gitEnter() {
             if (currentItem) {
-                var pos = currentItem.mapToItem(listView, 0, currentItem.height);
-                contextMenu.popup(pos.x, pos.y)
+                stackView.push("GitFilesPage.qml", {"refName" : currentItem.refFullName, "filePath": "/"})
             }
         }
 
@@ -40,9 +44,10 @@ ColumnLayout {
 
             switch (event.key )
             {
-            case Qt.Key_Space:
-                console.log("listView Qt.Key_Space pressed");
-                listView.gitMenu();
+            case Qt.Key_Enter:
+            case Qt.Key_Return:
+                console.log("listView Qt.Key_Enter pressed");
+                listView.gitEnter()
                 event.accepted = true;
                 break;
             }
@@ -86,7 +91,7 @@ ColumnLayout {
 
                 onDoubleClicked: {
                     listView.currentIndex = item.index;
-                    stackView.push("GitFilesPage.qml", {"refName" : item.refFullName, "filePath": "/"})
+                    listView.gitEnter()
                 }
             }
         }
@@ -111,27 +116,6 @@ ColumnLayout {
                 onActivated: listView.gitUpdate()
             }
 
-        }
-
-        Menu {
-            id: contextMenu
-
-            MenuItem {
-                text: qsTr("Stage") + " (S)"
-                onTriggered: listView.gitStage()
-            }
-            MenuItem {
-                text: qsTr("Restore staged") + " (R)"
-                onTriggered: listView.gitRestoreStaged()
-            }
-            MenuItem {
-                text: qsTr("Checkout HEAD") + " (C)"
-                onTriggered: listView.gitCheckoutHead()
-            }
-            MenuItem {
-                text: qsTr("Remove") + " (DEL)"
-                onTriggered: listView.gitRemoveFile();
-            }
         }
     }
 

@@ -14,7 +14,10 @@ ColumnLayout {
 
     Component.onCompleted: {
         filesModel.update();
+        listView.currentIndex = 0;
     }
+
+    StackView.onActivated: listView.forceActiveFocus()
 
     GitFilesModel {
         id: filesModel
@@ -22,23 +25,6 @@ ColumnLayout {
         referenceName: root.refName
         filePath: root.filePath
     }
-
-    function handleKeys(event)
-    {
-        if (event.modifiers !== 0)
-            return;
-
-        switch (event.key )
-        {
-        case Qt.Key_Backspace:
-            console.log("GitFilesPage Qt.Key_Backspace pressed");
-            stackView.pop()
-            event.accepted = true
-            break;
-        }
-    }
-
-    Keys.onPressed: event => handleKeys(event)
 
     Rectangle {
         id: header
@@ -57,7 +43,7 @@ ColumnLayout {
             }
 
             Label {
-                text: "path: " + filePath
+                text: "path: " + filesModel.filePath
             }
 
             Item {
@@ -75,16 +61,34 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
 
-        function gitMenu() {
+        function gitEnter() {
             if (currentItem) {
-                var pos = currentItem.mapToItem(listView, 0, currentItem.height);
-                contextMenu.popup(pos.x, pos.y)
+                var item = currentItem;
+
+                if ( item.fileType === "up" ) {
+                    gitBack();
+                    return
+                }
+
+                if ( item.fileType !== "tree" )
+                    return
+
+                filesModel.enter(item.fileName);
+
+                listView.currentIndex = 0;
             }
         }
 
-        function gitUpdate() {
-            console.log("gitUpdate")
-            filesModel.update();
+        function gitBack() {
+            console.log("gitBack() " + filesModel.filePath + " leave")
+
+            if ( filesModel.filePath==="/" ) {
+                console.log("gitBack() pop")
+                stackView.pop();
+                return;
+            }
+
+            listView.currentIndex = filesModel.leave();
         }
 
         function handleKeys(event)
@@ -94,10 +98,16 @@ ColumnLayout {
 
             switch (event.key )
             {
-            case Qt.Key_Space:
-                console.log("listView Qt.Key_Space pressed");
-                listView.gitMenu();
+            case Qt.Key_Enter:
+            case Qt.Key_Return:
+                console.log("listView Qt.Key_Enter pressed");
+                listView.gitEnter()
                 event.accepted = true;
+                break;
+            case Qt.Key_Backspace:
+                console.log("GitFilesPage Qt.Key_Backspace pressed");
+                listView.gitBack();
+                event.accepted = true
                 break;
             }
         }
@@ -127,35 +137,7 @@ ColumnLayout {
                     listView.forceActiveFocus();
                 }
 
-                onDoubleClicked: {
-                    if ( item.fileType == "up" ) {
-                        if ( root.filePath=="/" ) {
-                            stackView.pop()
-                            return
-                        }
-
-                        var path = root.filePath.substring(1)
-                        var pos = path.indexOf("/")
-                        if ( pos < 0 ) {
-                            root.filePath = "/"
-                            return
-                        }
-
-                        root.filePath = "/" + path.substring(0, pos)
-                        return
-
-                    }
-                    if ( item.fileType != "tree" )
-                        return
-
-                    if ( root.filePath == "/" )
-                        root.filePath = "/" + item.fileName;
-                    else
-                        root.filePath = root.filePath + "/" + item.fileName;
-
-                    //? listView.currentIndex = 0;
-                    //? listView.forceActiveFocus();
-                }
+                onDoubleClicked: listView.gitEnter()
             }
 
             MouseArea {

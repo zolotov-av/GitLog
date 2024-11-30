@@ -62,6 +62,8 @@ public:
     const QString& filePath() const { return m_file_path; }
     void setFilePath(const QString &path);
 
+    Q_INVOKABLE int indexOf(const QString &file);
+
 private:
 
     void readTree(const git::tree &tree);
@@ -70,6 +72,22 @@ public slots:
 
     void clear();
     void update();
+
+    /**
+     * @brief Войти в подкаталог
+     * @param file имя подкаталога
+     *
+     * Если это файл, то ничего не делать
+     */
+    void enter(const QString &file);
+
+    /**
+     * @brief Выйти из каталога
+     * @return номер строки каталога
+     *
+     * Если это корневой каталог, то ничего не делать
+     */
+    Q_INVOKABLE int leave();
 
 signals:
 
