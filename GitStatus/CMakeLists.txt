@@ -14,6 +14,7 @@ qt_add_qml_module(GitStatus
     URI Status
     VERSION 1.0
     QML_FILES
+        GitStatusPage.qml
         GitStatus.qml
     DEPENDENCIES
         GitCore
