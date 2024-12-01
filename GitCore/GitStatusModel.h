@@ -1,7 +1,6 @@
 #pragma once
 
-#include "GitFileInfo.h"
-#include <gitcxx/repository.h>
+#include "GitFileStatus.h"
 #include <QAbstractItemModel>
 #include <QQmlEngine>
 #include <QList>
@@ -12,23 +11,24 @@ class GitStatusModel: public QAbstractItemModel
 {
     Q_OBJECT
     QML_ELEMENT
+
     Q_PROPERTY(GitRepository* repository READ repository WRITE setRepository NOTIFY repositoryChanged FINAL)
 
 public:
 
     enum Roles
     {
-        fileRole = Qt::DisplayRole,
-        colorRole = Qt::ForegroundRole,
-        statusRole = Qt::UserRole
+        fileNameRole = Qt::DisplayRole,
+        fileColorRole = Qt::ForegroundRole,
+        fileStatusRole = Qt::UserRole,
+        statusSourceRole
     };
 
 private:
 
     GitRepository *m_repo { nullptr };
 
-    QList<GitFileInfo> m_items;
-    QList<QColor> m_colors;
+    QList<GitFileStatus> m_items;
 
 public:
 
@@ -53,7 +53,11 @@ public:
     GitRepository* repository() { return m_repo; }
     void setRepository(GitRepository *r);
 
-    Q_INVOKABLE void update();
+public slots:
+
+    void update();
+
+public:
 
     /**
      * @brief Добавить файл в индекс

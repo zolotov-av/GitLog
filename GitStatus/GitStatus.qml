@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import GitCore
 
 ApplicationWindow {
     id: root
@@ -10,6 +11,15 @@ ApplicationWindow {
     height: 800
 
     font.pixelSize: 20
+
+    Component.onCompleted: {
+        gitRepo.open()
+    }
+
+    GitRepository {
+        id: gitRepo
+        path: "/home/alex/prj/test/GitTest"
+    }
 
     StackView {
         id: stackView

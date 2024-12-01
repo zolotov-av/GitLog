@@ -4,24 +4,15 @@ import QtQuick.Controls
 import GitCore
 
 Item {
+    id: root
 
-    Component.onCompleted: {
-        statusModel.repository.open()
-        statusModel.update()
-    }
+    Component.onCompleted: listView.currentIndex = 0
 
-    StackView.onActivated: {
-        listView.currentIndex = 0
-        listView.forceActiveFocus()
-    }
+    StackView.onActivated: listView.forceActiveFocus()
 
     GitStatusModel {
         id: statusModel
-
-        repository: GitRepository {
-            id: gitRepo
-            path: "/home/alex/prj/test/GitTest"
-        }
+        repository: gitRepo
     }
 
     ColumnLayout {
@@ -58,6 +49,19 @@ Item {
             activeFocusOnTab: true
             Layout.fillWidth: true
             Layout.fillHeight: true
+
+            function gitEnter() {
+                if (currentItem) {
+                    var props = {
+                        "fileName": currentItem.fileName,
+                        "fileStatus": currentItem.fileStatus,
+                        "fileColor": currentItem.fileColor,
+                        "statusSource": currentItem.statusSource
+                    }
+
+                    stackView.push("GitDiffPage.qml", props)
+                }
+            }
 
             function gitMenu() {
                 if (currentItem) {
@@ -118,6 +122,11 @@ Item {
 
                 switch (event.key )
                 {
+                case Qt.Key_Enter:
+                case Qt.Key_Return:
+                    listView.gitEnter();
+                    event.accepted = true;
+                    break;
                 case Qt.Key_Space:
                     console.log("listView Qt.Key_Space pressed");
                     listView.gitMenu();
@@ -141,6 +150,7 @@ Item {
                 required property string fileName
                 required property string fileStatus
                 required property color fileColor
+                required property string statusSource
 
                 Label {
                     id: txt
@@ -154,6 +164,8 @@ Item {
                         listView.currentIndex = item.index;
                         listView.forceActiveFocus();
                     }
+
+                    onDoubleClicked: listView.gitEnter()
                 }
 
                 MouseArea {

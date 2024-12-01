@@ -9,8 +9,8 @@ qt_standard_project_setup()
 add_library(GitCore STATIC
     ReferenceInfo.h
     ReferenceInfo.cpp
-    GitFileInfo.h
-    GitFileInfo.cpp
+    GitFileStatus.h
+    GitFileStatus.cpp
     GitTools/CommitInfo.h
     GitTools/QuickDialog.h
     GitTools/QuickDialog.cpp

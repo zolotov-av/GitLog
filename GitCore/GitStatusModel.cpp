@@ -50,12 +50,14 @@ QVariant GitStatusModel::data(const QModelIndex &index, int role) const
 
     switch (role )
     {
-    case fileRole:
+    case fileNameRole:
         return m_items.at(index.row()).fileName();
-    case statusRole:
+    case fileStatusRole:
         return m_items.at(index.row()).statusName();
-    case colorRole:
-        return m_colors.at(index.row());
+    case fileColorRole:
+        return m_items.at(index.row()).fileColor();
+    case statusSourceRole:
+        return m_items.at(index.row()).statusSource();
     default:
         return QVariant{ };
     }
@@ -64,9 +66,10 @@ QVariant GitStatusModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> GitStatusModel::roleNames() const
 {
     return {
-        {fileRole, "fileName"},
-        {colorRole, "fileColor"},
-        {statusRole, "fileStatus"}
+        {fileNameRole, "fileName"},
+        {fileColorRole, "fileColor"},
+        {fileStatusRole, "fileStatus"},
+        {statusSourceRole, "statusSource"}
     };
 }
 
@@ -75,7 +78,13 @@ void GitStatusModel::setRepository(GitRepository *r)
     if ( m_repo == r )
         return;
 
+    if ( m_repo )
+        disconnect(m_repo, &GitRepository::stateChanged, this, &GitStatusModel::update);
+
     m_repo = r;
+
+    if ( m_repo )
+        connect(m_repo, &GitRepository::stateChanged, this, &GitStatusModel::update);
 
     emit repositoryChanged();
 
@@ -89,7 +98,6 @@ void GitStatusModel::update()
         beginResetModel();
 
         m_items.clear();
-        m_colors.clear();
 
         endResetModel();
         return;
@@ -105,13 +113,6 @@ void GitStatusModel::update()
     const auto reserveSize = diffWorktree.deltaCount() + diffCached.deltaCount();
     m_items.clear();
     m_items.reserve(reserveSize);
-    m_colors.clear();
-    m_colors.reserve(reserveSize);
-
-    constexpr QColor cachedColor{0x18, 0xb2, 0x18};
-    constexpr QColor modifiedColor{0xb2, 0x18, 0x18};
-    constexpr QColor untrackedColor{0x35, 0x35, 0x35};
-    constexpr QColor conflictedColor{0xFF, 0x98, 0x00};
 
     unsigned deltaCount = diffCached.deltaCount();
     for(unsigned i = 0; i < deltaCount; i++)
@@ -120,8 +121,7 @@ void GitStatusModel::update()
         if ( delta.type() == GIT_DELTA_CONFLICTED )
             continue;
 
-        m_items.append(delta);
-        m_colors.append(cachedColor);
+        m_items.append(GitFileStatus{GitFileStatus::Stage, delta});
     }
 
     deltaCount = diffWorktree.deltaCount();
@@ -131,8 +131,7 @@ void GitStatusModel::update()
         if ( delta.type() == GIT_DELTA_UNTRACKED || delta.type() == GIT_DELTA_CONFLICTED )
             continue;
 
-        m_items.append(delta);
-        m_colors.append(modifiedColor);
+        m_items.append(GitFileStatus{GitFileStatus::Worktree, delta});
     }
 
     for(unsigned i = 0; i < deltaCount; i++)
@@ -141,8 +140,7 @@ void GitStatusModel::update()
         if ( delta.type() != GIT_DELTA_CONFLICTED )
             continue;
 
-        m_items.append(delta);
-        m_colors.append(conflictedColor);
+        m_items.append(GitFileStatus{GitFileStatus::Conflict, delta});
     }
 
     for(unsigned i = 0; i < deltaCount; i++)
@@ -151,8 +149,7 @@ void GitStatusModel::update()
         if ( delta.type() != GIT_DELTA_UNTRACKED )
             continue;
 
-        m_items.append(delta);
-        m_colors.append(untrackedColor);
+        m_items.append(GitFileStatus{GitFileStatus::Untracked, delta});
     }
 
     endResetModel();
