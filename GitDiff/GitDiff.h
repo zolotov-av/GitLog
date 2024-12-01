@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QQmlApplicationEngine>
-#include <GitTools/DiffModel.h>
+#include <GitDiffModel.h>
 
 /**
  * @brief Окно GitDiff
@@ -19,7 +19,7 @@ private:
 
     QString m_old_file_name { };
     QString m_new_file_name { };
-    DiffModel m_line_model { this };
+    GitDiffModel m_line_model { this };
 
 public:
 

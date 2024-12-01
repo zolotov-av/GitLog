@@ -1,4 +1,4 @@
-#include "DiffModel.h"
+#include "GitDiffModel.h"
 #include <QFile>
 #include <QBuffer>
 #include <QTextStream>
@@ -11,7 +11,7 @@ namespace
 
     struct PayloadData
     {
-        QList<DiffModel::LineInfo> *items;
+        QList<GitDiffModel::LineInfo> *items;
         QStringList left;
         QStringList right;
         QColor addedColor;
@@ -21,7 +21,7 @@ namespace
 
         void append(const QString &line, QColor color)
         {
-            DiffModel::LineInfo item;
+            GitDiffModel::LineInfo item;
             item.lineNumber = items->size() + 1;
             item.lineText = line;
             item.lineColor = color;
@@ -66,7 +66,7 @@ namespace
         return items;
     }
 
-    QString joinLines(const QList<DiffModel::LineInfo> &items)
+    QString joinLines(const QList<GitDiffModel::LineInfo> &items)
     {
         int size = items.size();
         for(const auto &item : items)
@@ -127,17 +127,17 @@ namespace
 
 } // namespace
 
-DiffModel::DiffModel(QObject *parent): QAbstractListModel{parent}
+GitDiffModel::GitDiffModel(QObject *parent): QAbstractListModel{parent}
 {
 
 }
 
-DiffModel::~DiffModel()
+GitDiffModel::~GitDiffModel()
 {
 
 }
 
-QModelIndex DiffModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex GitDiffModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (row < 0 || row >= m_items.size() || column != 0 || parent.isValid()) {
         return QModelIndex();
@@ -146,12 +146,12 @@ QModelIndex DiffModel::index(int row, int column, const QModelIndex &parent) con
     return createIndex(row, column);
 }
 
-QModelIndex DiffModel::parent(const QModelIndex &index) const
+QModelIndex GitDiffModel::parent(const QModelIndex &index) const
 {
     return QModelIndex();
 }
 
-int DiffModel::rowCount(const QModelIndex &parent) const
+int GitDiffModel::rowCount(const QModelIndex &parent) const
 {
     if ( parent.isValid() )
         return 0;
@@ -159,7 +159,7 @@ int DiffModel::rowCount(const QModelIndex &parent) const
     return m_items.size();
 }
 
-QVariant DiffModel::data(const QModelIndex &index, int role) const
+QVariant GitDiffModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.row() < 0 || index.row() >= m_items.size()) {
         return QVariant{};
@@ -180,7 +180,7 @@ QVariant DiffModel::data(const QModelIndex &index, int role) const
     }
 }
 
-QHash<int, QByteArray> DiffModel::roleNames() const
+QHash<int, QByteArray> GitDiffModel::roleNames() const
 {
     return {
         {LineNumberRole, "lineNumber"},
@@ -189,7 +189,7 @@ QHash<int, QByteArray> DiffModel::roleNames() const
     };
 }
 
-void DiffModel::loadFromFile(const QString &path)
+void GitDiffModel::loadFromFile(const QString &path)
 {
     beginResetModel();
     m_items.clear();
@@ -226,7 +226,7 @@ void DiffModel::loadFromFile(const QString &path)
     endResetModel();
 }
 
-void DiffModel::setContent(const QByteArray &data)
+void GitDiffModel::setContent(const QByteArray &data)
 {
     beginResetModel();
     m_items.clear();
@@ -261,7 +261,7 @@ void DiffModel::setContent(const QByteArray &data)
     emit textChanged();
 }
 
-void DiffModel::setLineColor(int row, QColor color)
+void GitDiffModel::setLineColor(int row, QColor color)
 {
     if ( row < 0 || row >= m_items.size() )
         return;
@@ -272,14 +272,14 @@ void DiffModel::setLineColor(int row, QColor color)
     //emit dataChanged(modelIndex, modelIndex);
 }
 
-void DiffModel::clear()
+void GitDiffModel::clear()
 {
     beginResetModel();
     m_items.clear();
     endResetModel();
 }
 
-void DiffModel::addLine(const QString &text, QColor color)
+void GitDiffModel::addLine(const QString &text, QColor color)
 {
     beginInsertRows({}, m_items.size(), m_items.size());
 
@@ -294,7 +294,7 @@ void DiffModel::addLine(const QString &text, QColor color)
     endInsertRows();
 }
 
-void DiffModel::setDiff(const QByteArray &left, const QByteArray &right)
+void GitDiffModel::setDiffBuffers(const QByteArray &left, const QByteArray &right)
 {
     beginResetModel();
     m_items.clear();
@@ -361,7 +361,7 @@ static QByteArray getData(git::repository *repo, const git::object_id &oid)
     return data;
 }
 
-void DiffModel::setGitDelta(git::repository *repo, git::diff_delta delta, bool isWorktree)
+void GitDiffModel::setGitDelta(git::repository *repo, git::diff_delta delta, bool isWorktree)
 {
     switch (delta.type())
     {
@@ -372,7 +372,7 @@ void DiffModel::setGitDelta(git::repository *repo, git::diff_delta delta, bool i
         if ( QFileInfo(path).isFile() )
         {
             qDebug().noquote() << "GIT_DELTA_UNTRACKED";
-            setDiff(QByteArray{}, readFromFile(path));
+            setDiffBuffers(QByteArray{}, readFromFile(path));
             return;
         }
         else
@@ -400,13 +400,13 @@ void DiffModel::setGitDelta(git::repository *repo, git::diff_delta delta, bool i
 
         const QByteArray oldData = getData(repo, oldOid);
         const QByteArray newData = readFromFile(path);
-        setDiff(oldData, newData);
+        setDiffBuffers(oldData, newData);
     }
     else
     {
         const QByteArray oldData = getData(repo, oldOid);
         const QByteArray newData = getData(repo, newOid);
-        setDiff(oldData, newData);
+        setDiffBuffers(oldData, newData);
     }
 
 }

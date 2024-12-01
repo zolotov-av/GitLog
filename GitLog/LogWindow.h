@@ -2,7 +2,7 @@
 
 #include <QQmlApplicationEngine>
 #include <QSettings>
-#include <GitTools/DiffModel.h>
+#include <GitDiffModel.h>
 #include <GitTools/GitLogModel.h>
 #include <GitTools/CreateBranchDialog.h>
 #include "CommitDialog.h"
@@ -32,7 +32,7 @@ private:
     int m_current_commit_index { -1 };
     QString m_commit_message { "some text" };
     GitLogModel *m_log_model { nullptr };
-    DiffModel m_diff_model { this };
+    GitDiffModel m_diff_model { this };
     CreateBranchDialog *createBrunchDialog { nullptr };
 
 public:

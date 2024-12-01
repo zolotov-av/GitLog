@@ -26,7 +26,7 @@ GitDiff::~GitDiff()
 
 void GitDiff::diffData(const QByteArray &oldData, const QByteArray &newData)
 {
-    m_line_model.setDiff(oldData, newData);
+    m_line_model.setDiffBuffers(oldData, newData);
 
     emit diffChanged();
 }

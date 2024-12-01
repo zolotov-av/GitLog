@@ -1,15 +1,21 @@
 #pragma once
 
 #include <QAbstractListModel>
-#include <QObject>
+#include <QQmlEngine>
 #include <QColor>
 #include <QList>
 #include <gitcxx/repository.h>
 #include <gitcxx/diff_delta.h>
 
-class DiffModel: public QAbstractListModel
+/**
+ * @brief Модель для подсветки строк в DiffArea
+ * @ingroup GitCore
+ */
+class GitDiffModel: public QAbstractListModel
 {
     Q_OBJECT
+    QML_ELEMENT
+
     Q_PROPERTY(QString text READ text NOTIFY textChanged FINAL)
 
 public:
@@ -35,13 +41,13 @@ private:
 
 public:
 
-    explicit DiffModel(QObject *parent = nullptr);
-    DiffModel(const DiffModel &) = delete;
-    DiffModel(DiffModel &&) = delete;
-    ~DiffModel();
+    explicit GitDiffModel(QObject *parent = nullptr);
+    GitDiffModel(const GitDiffModel &) = delete;
+    GitDiffModel(GitDiffModel &&) = delete;
+    ~GitDiffModel();
 
-    DiffModel& operator = (const DiffModel &) = delete;
-    DiffModel& operator = (DiffModel &&) = delete;
+    GitDiffModel& operator = (const GitDiffModel &) = delete;
+    GitDiffModel& operator = (GitDiffModel &&) = delete;
 
     QModelIndex index(int row, int column = 0, const QModelIndex &parent = QModelIndex()) const override;
     QModelIndex parent(const QModelIndex &index) const override;
@@ -57,10 +63,10 @@ public:
 
     void setLineColor(int row, QColor color);
 
-    void clear();
+    Q_INVOKABLE void clear();
     void addLine(const QString &text, QColor color);
 
-    void setDiff(const QByteArray &left, const QByteArray &right);
+    void setDiffBuffers(const QByteArray &left, const QByteArray &right);
     void setGitDelta(git::repository *repo, git::diff_delta delta, bool isWorktree);
 
     QString text() { return m_text; }

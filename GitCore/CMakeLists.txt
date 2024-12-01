@@ -20,8 +20,6 @@ add_library(GitCore STATIC
     GitTools/GitLogModel.h
     GitTools/GitCommitFiles.cpp
     GitTools/GitLogModel.cpp
-    GitTools/DiffModel.h
-    GitTools/DiffModel.cpp
 )
 
 qt_add_qml_module(GitCore
@@ -45,6 +43,8 @@ qt_add_qml_module(GitCore
         GitRefsModel.cpp
         GitFilesModel.h
         GitFilesModel.cpp
+        GitDiffModel.h
+        GitDiffModel.cpp
         GitStatusModel.h
         GitStatusModel.cpp
         GraphItem.h
