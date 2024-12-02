@@ -30,6 +30,10 @@ Item {
     }
 
     Keys.onPressed: event => handleKeys(event)
+    StackView.onActivated: {
+        diffModel.update()
+        diffArea.editor.forceActiveFocus()
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -74,12 +78,15 @@ Item {
 
             DiffArea {
                 id: diffArea
-                model: GitDiffModel {
-
-                }
-
                 readOnly: true
                 anchors.fill: parent
+
+                model: GitDiffModel {
+                    id: diffModel
+                    repository: gitRepo
+                    filePath: root.fileName
+                    fileSource: root.statusSource
+                }
             }
         }
 
@@ -101,6 +108,12 @@ Item {
 
                 Item {
                     Layout.fillWidth: true
+                }
+
+                Button {
+                    id: backButton
+                    text: qsTr("Back")
+                    onClicked: root.gitLeave()
                 }
             }
 

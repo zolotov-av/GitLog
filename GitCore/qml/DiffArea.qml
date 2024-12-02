@@ -10,7 +10,8 @@ Rectangle {
     property int fontSize: 18
     property string fontFamily: "Monospace"
     property int lineNumberWidth: 50
-    property alias readOnly: editor.readOnly
+    property alias readOnly: textEdit.readOnly
+    property alias editor: textEdit
 
     Rectangle {
         color: "burlywood"
@@ -22,6 +23,7 @@ Rectangle {
         id: lv
         anchors.fill: parent
         interactive: false
+        activeFocusOnTab: false
 
         // Синхронизируем с Flickable
         contentY: scrollView.contentItem.contentY
@@ -66,13 +68,14 @@ Rectangle {
         clip: true
 
         TextEdit {
-            id: editor
+            id: textEdit
             font.family: root.fontFamily
             font.pixelSize: root.fontSize
             wrapMode: TextEdit.NoWrap
             text: lv.model.text
             selectByMouse: true // Разрешаем выделение мышью
             mouseSelectionMode: TextEdit.SelectCharacters
+            activeFocusOnTab: true
 
             leftPadding: root.lineNumberWidth + 4
             rightPadding: 4

@@ -56,7 +56,7 @@ namespace git
 
         index getIndex();
 
-        QString workdir();
+        QString workdir() const;
 
         reference head();
 
@@ -96,9 +96,28 @@ namespace git
 
         git::diff diff();
 
+        /**
+         * @brief Сравнить файл в индексе с файлом в рабочем каталоге
+         * @param file
+         * @return объект git::diff
+         *
+         * Аналог команды git diff -- file
+         */
+        git::diff diffWorktreeFile(const QString &file);
+
         git::diff diff(const git::tree &a, const git::tree &b);
 
         git::diff diff_cached(const git::tree &a);
+
+        /**
+         * @brief Сравнить файл в индексе с файлом в коммитие
+         * @param commit
+         * @param file
+         * @return объект git::diff
+         *
+         * Аналог команды git diff --cached commit -- file
+         */
+        git::diff diffCachedFile(const git::commit &commit, const QString &file);
 
         /**
          * @brief Добавить файл/каталог в индекс

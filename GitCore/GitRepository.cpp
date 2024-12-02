@@ -44,6 +44,11 @@ void GitRepository::close()
     emit stateChanged();
 }
 
+git::diff GitRepository::diffStage(const git::commit &commit)
+{
+    return m_repo.diff_cached(commit.commitTree());
+}
+
 void GitRepository::stageAll(const QString &path, unsigned int flags)
 {
     aw::trace::log("GitRepository::stageAll(%s)", path);

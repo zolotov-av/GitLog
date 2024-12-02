@@ -42,6 +42,8 @@ public:
 
     git::repository* repo() { return &m_repo; }
 
+    QString workdir() const { return m_repo.workdir(); }
+
     git::index getIndex() { return m_repo.getIndex(); }
 
     git::reference head() { return m_repo.head(); }
@@ -53,12 +55,38 @@ public:
     git::reference lookupReference(const QString &refName) { return m_repo.lookupReference(refName); }
     git::reference lookupReferenceDwim(const QString &shortName) { return m_repo.lookupReferenceDwim(shortName); }
 
+    git::blob lookupBlob(const git::object_id &oid) { return m_repo.lookupBlob(oid); }
+
     git::commit lookupCommit(const git_oid *id) { return m_repo.lookupCommit(id); }
     git::commit lookupCommit(const git::object_id &oid) { return m_repo.lookupCommit(oid); }
     git::commit lookupCommit(const QString &hash) { return m_repo.lookupCommit(hash); }
     git::commit lookupCommit(const git::reference &ref) { return m_repo.lookupCommit(ref.resolve().target()); }
 
     git::tree lookupTree(const git::object_id &oid) { return m_repo.lookupTree(oid); }
+
+    git::diff diffWorktree() { return m_repo.diff(); }
+    git::diff diffTree(const git::tree &a, const git::tree &b) { return m_repo.diff(a, b); }
+    git::diff diffStage(const git::tree &tree) { return m_repo.diff_cached(tree); }
+    git::diff diffStage(const git::commit &commit);
+
+    /**
+     * @brief Сравнить файл в индексе с файлом в рабочем каталоге
+     * @param file
+     * @return объект git::diff
+     *
+     * Аналог команды git diff -- file
+     */
+    git::diff diffWorktreeFile(const QString &file) { return m_repo.diffWorktreeFile(file); }
+
+    /**
+     * @brief Сравнить файл в индексе с файлом в коммитие
+     * @param commit
+     * @param file
+     * @return объект diff
+     *
+     * Аналог команды git diff --cached commit -- file
+     */
+    git::diff diffCachedFile(const git::commit &commit, const QString &file) { return m_repo.diffCachedFile(commit, file); }
 
     /**
      * @brief Добавить файл/каталог в индекс

@@ -57,7 +57,7 @@ namespace git
         return index{ idx };
     }
 
-    QString repository::workdir()
+    QString repository::workdir() const
     {
         return QString::fromUtf8( git_repository_workdir(m_repo) );
     }
@@ -171,6 +171,22 @@ namespace git
         return { d };
     }
 
+    diff repository::diffWorktreeFile(const QString &file)
+    {
+        git_diff *d { nullptr };
+        git_diff_options opts { };
+        opts.version = GIT_DIFF_OPTIONS_VERSION;
+        opts.flags = GIT_DIFF_NORMAL;
+        git_strarray paths { };
+        auto utf8_path = file.toUtf8();
+        char *pathspec[] = { utf8_path.data() };
+        paths.strings = pathspec;
+        paths.count = 1;
+        opts.pathspec = paths;
+        check( git_diff_index_to_workdir(&d, m_repo, nullptr, &opts) );
+        return { d };
+    }
+
     diff repository::diff(const tree &a, const tree &b)
     {
         git_diff *d { nullptr };
@@ -182,6 +198,23 @@ namespace git
     {
         git_diff *d { nullptr };
         check( git_diff_tree_to_index(&d, m_repo, a.data(), nullptr, nullptr) );
+        return { d };
+    }
+
+    diff repository::diffCachedFile(const commit &commit, const QString &file)
+    {
+        git_diff *d { nullptr };
+        auto commitTree = commit.commitTree();
+        git_diff_options opts { };
+        opts.version = GIT_DIFF_OPTIONS_VERSION;
+        opts.flags = GIT_DIFF_NORMAL;
+        git_strarray paths { };
+        auto utf8_path = file.toUtf8();
+        char *pathspec[] = { utf8_path.data() };
+        paths.strings = pathspec;
+        paths.count = 1;
+        opts.pathspec = paths;
+        check( git_diff_tree_to_index(&d, m_repo, commitTree.data(), nullptr, &opts) );
         return { d };
     }
 

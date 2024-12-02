@@ -129,12 +129,12 @@ namespace
 
 GitDiffModel::GitDiffModel(QObject *parent): QAbstractListModel{parent}
 {
-
+    aw::trace::log("GitDiffModel create");
 }
 
 GitDiffModel::~GitDiffModel()
 {
-
+    aw::trace::log("GitDiffModel destroy");
 }
 
 QModelIndex GitDiffModel::index(int row, int column, const QModelIndex &parent) const
@@ -276,6 +276,7 @@ void GitDiffModel::clear()
 {
     beginResetModel();
     m_items.clear();
+    m_text.clear();
     endResetModel();
 }
 
@@ -409,4 +410,132 @@ void GitDiffModel::setGitDelta(git::repository *repo, git::diff_delta delta, boo
         setDiffBuffers(oldData, newData);
     }
 
+}
+
+void GitDiffModel::setRepository(GitRepository *r)
+{
+    if ( m_repo == r )
+        return;
+
+    if ( m_repo )
+        disconnect(m_repo, &GitRepository::stateChanged, this, &GitDiffModel::update);
+
+    m_repo = r;
+
+    if ( m_repo )
+        connect(m_repo, &GitRepository::stateChanged, this, &GitDiffModel::update);
+
+    emit repositoryChanged();
+}
+
+void GitDiffModel::setFilePath(const QString &path)
+{
+    if ( m_file_path == path )
+        return;
+
+    m_file_path = path;
+    emit filePathChanged();
+}
+
+void GitDiffModel::setFileSource(const QString &src)
+{
+    if ( m_file_source == src )
+        return;
+
+    m_file_source = src;
+    emit fileSourceChanged();
+}
+
+void GitDiffModel::setCachedFile(const QString &file)
+{
+    aw::trace::log("GitDiffModel::setCachedFile() %s", file);
+
+    const auto commit = m_repo->lookupCommit(m_repo->head().target());
+    const auto diff = m_repo->diffCachedFile(commit, file);
+    aw::trace::log("GitDiffModel::setCachedFile() deltaCount=%d", int(diff.deltaCount()));
+    if ( diff.deltaCount() == 1 )
+    {
+        setGitDelta(m_repo->repo(), diff.get_delta(0), false);
+        return;
+    }
+
+    clear();
+}
+
+void GitDiffModel::setWorktreeFile(const QString &file)
+{
+    aw::trace::log("GitDiffModel::setWorktreeFile() %s", file);
+
+    const auto diff = m_repo->diffWorktreeFile(file);
+    aw::trace::log("GitDiffModel::setWorktreeFile() deltaCount=%d", int(diff.deltaCount()));
+    if ( diff.deltaCount() == 1 )
+    {
+        setGitDelta(m_repo->repo(), diff.get_delta(0), false);
+        return;
+    }
+
+    clear();
+}
+
+void GitDiffModel::setConflictedFile(const QString &file)
+{
+    aw::trace::log("GitDiffModel::setConflictedFile() %s", file);
+
+    const QString path = QDir{m_repo->workdir()}.filePath(file);
+    if ( !QFileInfo{path}.isFile() )
+    {
+        aw::trace::log("GitDiffModel::setUntrackedFile() error: not file");
+        clear();
+        return;
+    }
+
+    const auto commit = m_repo->lookupCommit(m_repo->head().target());
+    const auto blob = m_repo->lookupBlob( commit.commitTree().entryByPath(file).id() );
+    setDiffBuffers(blob.rawContent(), readFromFile(path));
+}
+
+void GitDiffModel::setUntrackedFile(const QString &file)
+{
+    aw::trace::log("GitDiffModel::setUntrackedFile() %s", file);
+
+    const QString path = QDir{m_repo->workdir()}.filePath(file);
+    if ( !QFileInfo{path}.isFile() )
+    {
+        aw::trace::log("GitDiffModel::setUntrackedFile() error: not file");
+        clear();
+        return;
+    }
+
+    setDiffBuffers(QByteArray{ }, readFromFile(path));
+}
+
+void GitDiffModel::update()
+{
+    if ( m_file_source == "stage" )
+    {
+        setCachedFile(m_file_path);
+        return;
+    }
+
+    if ( m_file_source == "worktree" )
+    {
+        setWorktreeFile(m_file_path);
+        return;
+    }
+
+    if ( m_file_source == "conflict" )
+    {
+        setConflictedFile(m_file_path);
+        return;
+    }
+
+    if ( m_file_source == "untracked" )
+    {
+        setUntrackedFile(m_file_path);
+        return;
+    }
+
+    aw::trace::log("GitDiffModel::update() %s @ %s", m_file_path, m_file_source);
+
+    clear();
 }

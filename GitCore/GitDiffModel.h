@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GitRepository.h"
 #include <QAbstractListModel>
 #include <QQmlEngine>
 #include <QColor>
@@ -16,7 +17,10 @@ class GitDiffModel: public QAbstractListModel
     Q_OBJECT
     QML_ELEMENT
 
+    Q_PROPERTY(GitRepository* repository READ repository WRITE setRepository NOTIFY repositoryChanged FINAL)
     Q_PROPERTY(QString text READ text NOTIFY textChanged FINAL)
+    Q_PROPERTY(QString filePath READ filePath WRITE setFilePath NOTIFY filePathChanged FINAL)
+    Q_PROPERTY(QString fileSource READ fileSource WRITE setFileSource NOTIFY fileSourceChanged FINAL)
 
 public:
 
@@ -36,8 +40,11 @@ public:
 
 private:
 
+    GitRepository *m_repo { nullptr };
+    QString m_file_path { };
+    QString m_file_source { };
     QList<LineInfo> m_items;
-    QString m_text;
+    QString m_text { };
 
 public:
 
@@ -69,10 +76,32 @@ public:
     void setDiffBuffers(const QByteArray &left, const QByteArray &right);
     void setGitDelta(git::repository *repo, git::diff_delta delta, bool isWorktree);
 
+    GitRepository* repository() { return m_repo; }
+    void setRepository(GitRepository *r);
+
+    const QString& filePath() const { return m_file_path; }
+    void setFilePath(const QString &path);
+    const QString& fileSource() const { return m_file_source; }
+    void setFileSource(const QString &src);
+
     QString text() { return m_text; }
+
+private:
+
+    void setCachedFile(const QString &file);
+    void setWorktreeFile(const QString &file);
+    void setConflictedFile(const QString &file);
+    void setUntrackedFile(const QString &file);
+
+public slots:
+
+    void update();
 
 signals:
 
+    void repositoryChanged();
+    void filePathChanged();
+    void fileSourceChanged();
     void textChanged();
 
 };
