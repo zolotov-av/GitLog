@@ -88,9 +88,12 @@ public:
 
 private:
 
+    void setHeadFile(const QString &file);
     void setCachedFile(const QString &file);
     void setWorktreeFile(const QString &file);
     void setConflictedFile(const QString &file);
+    void setTheirsFile(const QString &file);
+    void setPatchFile(const QString &file);
     void setUntrackedFile(const QString &file);
 
 public slots:

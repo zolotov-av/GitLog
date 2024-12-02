@@ -16,6 +16,7 @@ qt_add_qml_module(GitStatus
     QML_FILES
         GitStatusPage.qml
         GitDiffPage.qml
+        GitMergePage.qml
         GitStatus.qml
     DEPENDENCIES
         GitCore

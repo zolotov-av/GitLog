@@ -26,10 +26,8 @@ namespace git
             m_oid = oid;
         }
 
-        constexpr object_id(const git_oid *oid)
+        constexpr object_id(const git_oid *oid): m_oid{oid ? *oid : git_oid{}}
         {
-            if ( oid )
-                m_oid = *oid;
         }
 
         explicit object_id(const QString &hash);

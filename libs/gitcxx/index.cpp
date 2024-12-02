@@ -22,6 +22,16 @@ namespace git
         return { entry->id };
     }
 
+    index::conflict_entry index::getConflictEntry(const QString &path)
+    {
+        const auto utf8_path = path.toUtf8();
+        const git_index_entry *ancestor { nullptr };
+        const git_index_entry *our { nullptr };
+        const git_index_entry *their { nullptr };
+        check( git_index_conflict_get(&ancestor, &our, &their, m_index, utf8_path.constData()) );
+        return conflict_entry{ancestor, our, their};
+    }
+
     void index::addByPath(const QString &path)
     {
         const auto utf8_path = path.toUtf8();

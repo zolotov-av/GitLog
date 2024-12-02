@@ -4,6 +4,7 @@
 #include <QTextStream>
 #include <QDebug>
 #include <QDir>
+#include <awCore/string.h>
 #include <awCore/trace.h>
 
 namespace
@@ -231,8 +232,6 @@ void GitDiffModel::setContent(const QByteArray &data)
     beginResetModel();
     m_items.clear();
 
-    m_text = QString::fromUtf8(data);
-
     int lineNumber = 0;
     QByteArray data2 { data };
     QBuffer file(&data2);
@@ -250,10 +249,12 @@ void GitDiffModel::setContent(const QByteArray &data)
             m_items.append(std::move(line));
         }
 
+        m_text = joinLines(m_items);
     }
     else
     {
-        aw::trace::log("Could not open file: %s" + file.errorString());
+        aw::trace::log("Could not open file: %s", file.errorString());
+        m_text = aw::qt_printf("Could not open file: %s", file.errorString());
     }
 
     endResetModel();
@@ -446,6 +447,16 @@ void GitDiffModel::setFileSource(const QString &src)
     emit fileSourceChanged();
 }
 
+void GitDiffModel::setHeadFile(const QString &file)
+{
+    aw::trace::log("GitDiffModel::setHeadFile() %s", file);
+
+    const auto commit = m_repo->lookupCommit(m_repo->head().target());
+    const auto blob = m_repo->lookupBlob( commit.commitTree().entryByPath(file).id() );
+
+    setContent(blob.rawContent());
+}
+
 void GitDiffModel::setCachedFile(const QString &file)
 {
     aw::trace::log("GitDiffModel::setCachedFile() %s", file);
@@ -494,6 +505,63 @@ void GitDiffModel::setConflictedFile(const QString &file)
     setDiffBuffers(blob.rawContent(), readFromFile(path));
 }
 
+void GitDiffModel::setTheirsFile(const QString &file)
+{
+    aw::trace::log("GitDiffModel::setTheirsFile() %s", file);
+    try
+    {
+        auto index = m_repo->getIndex();
+        const auto conflict = index.getConflictEntry(file);
+
+        aw::trace::log("GitDiffModel::setTheirsFile() ancestor: %s", conflict.ancestor.id().toString());
+        aw::trace::log("GitDiffModel::setTheirsFile() our: %s", conflict.our.id().toString());
+        aw::trace::log("GitDiffModel::setTheirsFile() their: %s", conflict.their.id().toString());
+
+        const auto blob = m_repo->lookupBlob( conflict.their.id() );
+
+        setContent(blob.rawContent());
+    }
+    catch(const std::exception &e)
+    {
+        aw::trace::log("GitDiffModel::setTheirsFile() error: %s", e.what());
+        clear();
+    }
+}
+
+void GitDiffModel::setPatchFile(const QString &file)
+{
+    const aw::trace fn("GitDiffModel::setPatchFile() %s", file);
+
+    try
+    {
+        git_rebase *rebase { nullptr };
+        git_rebase_options opts = GIT_REBASE_OPTIONS_INIT;
+        git_rebase_open(&rebase, m_repo->repo()->data(), &opts);
+
+        aw::trace::log("git_rebase_orig_head_name(): %s", git_rebase_orig_head_name(rebase));
+        aw::trace::log("git_rebase_orig_head_id(): %s", git::object_id{ git_rebase_orig_head_id(rebase) }.toString());
+        aw::trace::log("git_rebase_onto_name(): %s", git_rebase_onto_name(rebase));
+        //??? aw::trace::log("git_rebase_onto_id(): %s", git::object_id{ git_rebase_onto_id(rebase) }.toString());
+
+        aw::trace::log("git_rebase_operation_entrycount(): %d", int(git_rebase_operation_entrycount(rebase)));
+        aw::trace::log("git_rebase_operation_current(): %d", int(git_rebase_operation_current(rebase)));
+
+        const auto foo = git_rebase_operation_byindex(rebase, 0);
+
+        if ( foo == nullptr )
+            aw::trace::log("git_rebase_operation_byindex() null");
+
+        git_rebase_free(rebase);
+
+        setContent(QString{"<TODO>"}.toUtf8());
+    }
+    catch(const std::exception &e)
+    {
+        aw::trace::log("GitDiffModel::setPatchFile() error: %s", e.what());
+        clear();
+    }
+}
+
 void GitDiffModel::setUntrackedFile(const QString &file)
 {
     aw::trace::log("GitDiffModel::setUntrackedFile() %s", file);
@@ -511,6 +579,12 @@ void GitDiffModel::setUntrackedFile(const QString &file)
 
 void GitDiffModel::update()
 {
+    if ( m_file_source == "HEAD" )
+    {
+        setHeadFile(m_file_path);
+        return;
+    }
+
     if ( m_file_source == "stage" )
     {
         setCachedFile(m_file_path);
@@ -526,6 +600,18 @@ void GitDiffModel::update()
     if ( m_file_source == "conflict" )
     {
         setConflictedFile(m_file_path);
+        return;
+    }
+
+    if ( m_file_source == "theirs" )
+    {
+        setTheirsFile(m_file_path);
+        return;
+    }
+
+    if ( m_file_source == "patch" )
+    {
+        setPatchFile(m_file_path);
         return;
     }
 

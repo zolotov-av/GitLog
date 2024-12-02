@@ -59,7 +59,12 @@ Item {
                         "statusSource": currentItem.statusSource
                     }
 
-                    stackView.push("GitDiffPage.qml", props)
+                    if ( currentItem.statusSource === "conflict" ) {
+                        stackView.push("GitMergePage.qml", props)
+                    } else {
+                        stackView.push("GitDiffPage.qml", props)
+                    }
+
                 }
             }
 
