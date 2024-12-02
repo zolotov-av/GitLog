@@ -4,6 +4,7 @@
 #include <QTextStream>
 #include <QDebug>
 #include <QDir>
+#include <gitcxx/exception.h>
 #include <awCore/string.h>
 #include <awCore/trace.h>
 
@@ -534,26 +535,25 @@ void GitDiffModel::setPatchFile(const QString &file)
 
     try
     {
-        git_rebase *rebase { nullptr };
-        git_rebase_options opts = GIT_REBASE_OPTIONS_INIT;
-        git_rebase_open(&rebase, m_repo->repo()->data(), &opts);
+        const QString stoppedShaPath = QDir{m_repo->gitdir()}.filePath("rebase-merge/stopped-sha");
+        if ( !QFileInfo{stoppedShaPath}.isFile() )
+            throw git::exception("rebase-merge/stopped-sha not found");
 
-        aw::trace::log("git_rebase_orig_head_name(): %s", git_rebase_orig_head_name(rebase));
-        aw::trace::log("git_rebase_orig_head_id(): %s", git::object_id{ git_rebase_orig_head_id(rebase) }.toString());
-        aw::trace::log("git_rebase_onto_name(): %s", git_rebase_onto_name(rebase));
-        //??? aw::trace::log("git_rebase_onto_id(): %s", git::object_id{ git_rebase_onto_id(rebase) }.toString());
+        const git::object_id stoppedId { QString::fromUtf8( readFromFile(stoppedShaPath) ).trimmed() };
 
-        aw::trace::log("git_rebase_operation_entrycount(): %d", int(git_rebase_operation_entrycount(rebase)));
-        aw::trace::log("git_rebase_operation_current(): %d", int(git_rebase_operation_current(rebase)));
+        aw::trace::log("rebase-merge/stopped-sha = [%s]", stoppedId.toString());
 
-        const auto foo = git_rebase_operation_byindex(rebase, 0);
+        const auto stoppedCommit = m_repo->lookupCommit(stoppedId);
+        if ( stoppedCommit.parentCount() > 1 )
+            throw git::exception("stoppedCommit.parentCount() > 1");
 
-        if ( foo == nullptr )
-            aw::trace::log("git_rebase_operation_byindex() null");
+        const auto stoppedParent = m_repo->lookupCommit(stoppedCommit.parentId(0));
+        const auto diff = m_repo->diffCommitFile(stoppedParent, stoppedCommit, file);
+        aw::trace::log("GitDiffModel::setPatchFile() deltaCount=%d", int(diff.deltaCount()));
+        if ( diff.deltaCount() != 1 )
+            throw git::exception("deltaCount() != 1");
 
-        git_rebase_free(rebase);
-
-        setContent(QString{"<TODO>"}.toUtf8());
+        setGitDelta(m_repo->repo(), diff.get_delta(0), false);
     }
     catch(const std::exception &e)
     {

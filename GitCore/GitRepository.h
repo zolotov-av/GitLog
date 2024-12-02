@@ -25,6 +25,8 @@ public:
     GitRepository& operator = (const GitRepository &) = delete;
     GitRepository& operator = (GitRepository &&) = delete;
 
+    static const char* stateName(int state) { return git::repository::stateName(state); }
+
 private:
 
     template <typename ...Args>
@@ -42,6 +44,22 @@ public:
 
     git::repository* repo() { return &m_repo; }
 
+    int state() const { return m_repo.state(); }
+    QString stateName() const { return git::repository::stateName(m_repo.state()); }
+
+    /**
+     * @brief Путь к каталогу `.git`
+     * @return
+     *
+     * Это путь к каталогу `.git` для обычных репозитариев
+     * или путь к самому репозитарию для bare-репозитариев
+     */
+    QString gitdir() const { return m_repo.gitdir(); }
+
+    /**
+     * @brief Путь к рабочему каталогу
+     * @return Путь к рабочему каталогу или пустая строка для bare-репозитария
+     */
     QString workdir() const { return m_repo.workdir(); }
 
     git::index getIndex() { return m_repo.getIndex(); }
@@ -87,6 +105,30 @@ public:
      * Аналог команды git diff --cached commit -- file
      */
     git::diff diffCachedFile(const git::commit &commit, const QString &file) { return m_repo.diffCachedFile(commit, file); }
+
+    /**
+     * @brief Сравнить файл в двух деревьях
+     * @param a первое дерево
+     * @param b второе дерево
+     * @param file путь к файлу
+     * @return объект git::diff
+     */
+    git::diff diffTreeFile(const git::tree &a, const git::tree &b, const QString &file)
+    {
+        return m_repo.diffTreeFile(a, b, file);
+    }
+
+    /**
+     * @brief Сравнить файл в двух коммитах
+     * @param a первый коммит
+     * @param b второй коммит
+     * @param file путь к файлу
+     * @return объект git::diff
+     */
+    git::diff diffCommitFile(const git::commit &a, const git::commit &b, const QString &file)
+    {
+        return m_repo.diffCommitFile(a, b, file);
+    }
 
     /**
      * @brief Добавить файл/каталог в индекс

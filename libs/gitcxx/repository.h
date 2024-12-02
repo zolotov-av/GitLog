@@ -43,6 +43,8 @@ namespace git
         repository& operator = (const repository &) = delete;
         repository& operator = (repository &&other);
 
+        static const char* stateName(int state);
+
         bool isOpened() const
         {
             return m_repo != nullptr;
@@ -52,10 +54,25 @@ namespace git
 
         void close();
 
+        int state() const { return git_repository_state(m_repo); }
+
         config getConfig();
 
         index getIndex();
 
+        /**
+         * @brief Путь к каталогу `.git`
+         * @return
+         *
+         * Это путь к каталогу `.git` для обычных репозитариев
+         * или путь к самому репозитарию для bare-репозитариев
+         */
+        QString gitdir() const;
+
+        /**
+         * @brief Путь к рабочему каталогу
+         * @return Путь к рабочему каталогу или пустая строка для bare-репозитария
+         */
         QString workdir() const;
 
         reference head();
@@ -108,6 +125,24 @@ namespace git
         git::diff diff(const git::tree &a, const git::tree &b);
 
         git::diff diff_cached(const git::tree &a);
+
+        /**
+         * @brief Сравнить файл в двух деревьях
+         * @param a первое дерево
+         * @param b второе дерево
+         * @param file путь к файлу
+         * @return объект git::diff
+         */
+        git::diff diffTreeFile(const tree &a, const tree &b, const QString &file);
+
+        /**
+         * @brief Сравнить файл в двух коммитах
+         * @param a первый коммит
+         * @param b второй коммит
+         * @param file путь к файлу
+         * @return объект git::diff
+         */
+        git::diff diffCommitFile(const commit &a, const commit &b, const QString &file);
 
         /**
          * @brief Сравнить файл в индексе с файлом в коммитие

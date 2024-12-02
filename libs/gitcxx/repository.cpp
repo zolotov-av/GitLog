@@ -29,6 +29,26 @@ namespace git
         return *this;
     }
 
+    const char* repository::stateName(int state)
+    {
+        switch( state )
+        {
+        case GIT_REPOSITORY_STATE_NONE: return "none";
+        case GIT_REPOSITORY_STATE_MERGE: return "merge";
+        case GIT_REPOSITORY_STATE_REVERT: return "revert";
+        case GIT_REPOSITORY_STATE_REVERT_SEQUENCE: return "revert_sequence";
+        case GIT_REPOSITORY_STATE_CHERRYPICK: return "cherrypick";
+        case GIT_REPOSITORY_STATE_CHERRYPICK_SEQUENCE: return "cherrypick_sequence";
+        case GIT_REPOSITORY_STATE_BISECT: return "bisect";
+        case GIT_REPOSITORY_STATE_REBASE: return "rebase";
+        case GIT_REPOSITORY_STATE_REBASE_INTERACTIVE: return "rebase_interactive";
+        case GIT_REPOSITORY_STATE_REBASE_MERGE: return "rebase_merge";
+        case GIT_REPOSITORY_STATE_APPLY_MAILBOX: return "apply_mailbox";
+        case GIT_REPOSITORY_STATE_APPLY_MAILBOX_OR_REBASE: return "apply_mailbox_or_rebase";
+        default: return "unknown";
+        }
+    }
+
     void repository::open(const QString &path)
     {
         close();
@@ -55,6 +75,11 @@ namespace git
         git_index *idx { nullptr };
         check( git_repository_index(&idx, m_repo) );
         return index{ idx };
+    }
+
+    QString repository::gitdir() const
+    {
+        return QString::fromUtf8( git_repository_path(m_repo) );
     }
 
     QString repository::workdir() const
@@ -199,6 +224,27 @@ namespace git
         git_diff *d { nullptr };
         check( git_diff_tree_to_index(&d, m_repo, a.data(), nullptr, nullptr) );
         return { d };
+    }
+
+    diff repository::diffTreeFile(const tree &a, const tree &b, const QString &file)
+    {
+        git_diff *d { nullptr };
+        git_diff_options opts { };
+        opts.version = GIT_DIFF_OPTIONS_VERSION;
+        opts.flags = GIT_DIFF_NORMAL;
+        git_strarray paths { };
+        auto utf8_path = file.toUtf8();
+        char *pathspec[] = { utf8_path.data() };
+        paths.strings = pathspec;
+        paths.count = 1;
+        opts.pathspec = paths;
+        check( git_diff_tree_to_tree(&d, m_repo, a.data(), b.data(), &opts) );
+        return git::diff{ d };
+    }
+
+    diff repository::diffCommitFile(const commit &a, const commit &b, const QString &file)
+    {
+        return diffTreeFile(a.commitTree(), b.commitTree(), file);
     }
 
     diff repository::diffCachedFile(const commit &commit, const QString &file)
