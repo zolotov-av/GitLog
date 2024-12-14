@@ -43,6 +43,8 @@ qt_add_qml_module(GitCore
         GitRefsModel.cpp
         GitFilesModel.h
         GitFilesModel.cpp
+        GitDiffLine.h
+        GitDiffLine.cpp
         GitDiffModel.h
         GitDiffModel.cpp
         GitStatusModel.h

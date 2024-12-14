@@ -13,21 +13,50 @@ namespace
 
     struct PayloadData
     {
-        QList<GitDiffModel::LineInfo> *items;
-        QStringList left;
-        QStringList right;
-        QColor addedColor;
-        QColor removedColor;
-        int left_start;
-        int right_start;
+		/**
+		 * @brief старый контент разбитый на строки
+		 */
+		GitDiffLine::LineList old_lines { };
+
+		/**
+		 * @brief новый контент разбитый на строки
+		 */
+		GitDiffLine::LineList new_lines { };
+
+		/**
+		 * @brief нормализованные старый контент
+		 */
+		QByteArray oldContent { GitDiffLine::joinLines(old_lines.lines).toUtf8() };
+
+		/**
+		 * @brief нормализованные новый контент
+		 */
+		QByteArray newContent { GitDiffLine::joinLines(new_lines.lines).toUtf8() };
+
+		QList<GitDiffLine> items { };
+		int left_start { 1 };
+		int right_start { 1 };
+
+		PayloadData(const QByteArray &oldData, const QByteArray &newData):
+			old_lines{ GitDiffLine::splitLines(oldData) },
+			new_lines{ GitDiffLine::splitLines(newData) }
+		{
+
+		}
+
+		int oldLines() const { return old_lines.size(); }
+		int newLines() const { return new_lines.size(); }
+
+		QString oldLine(int lineNo) const { return old_lines.lines[lineNo-1]; }
+		QString newLine(int lineNo) const { return new_lines.lines[lineNo-1]; }
 
         void append(const QString &line, QColor color)
         {
-            GitDiffModel::LineInfo item;
-            item.lineNumber = items->size() + 1;
+			GitDiffLine item;
+			item.lineNumber = items.size() + 1;
             item.lineText = line;
             item.lineColor = color;
-            items->append(std::move(item));
+			items.append(std::move(item));
         }
     };
 
@@ -42,33 +71,7 @@ namespace
         return file.readAll();
     }
 
-    QStringList splitLines(const QByteArray &data)
-    {
-        QStringList items;
-
-        QByteArray data2 { data };
-        QBuffer file(&data2);
-        if ( file.open(QIODevice::ReadOnly | QIODevice::Text) )
-        {
-            while ( !file.atEnd() )
-            {
-                QString line = QString::fromUtf8( file.readLine() );
-                if ( line.endsWith(QChar{'\n'}) )
-                    line = line.mid(0, line.length()-1);
-
-                items.append(std::move(line));
-            }
-
-        }
-        else
-        {
-            aw::trace::log("Could not open file: " + file.errorString());
-        }
-
-        return items;
-    }
-
-    QString joinLines(const QList<GitDiffModel::LineInfo> &items)
+	QString joinLines(const QList<GitDiffLine> &items)
     {
         int size = items.size();
         for(const auto &item : items)
@@ -87,17 +90,21 @@ namespace
         return text;
     }
 
-    int hunk_cb(const git_diff_delta *delta, const git_diff_hunk *hunk, void *payload)
+	int hunk_cb(const git_diff_delta *delta, const git_diff_hunk *hunk, void *payload)
     {
+		const aw::trace fn("hunk_cb");
         const auto data = reinterpret_cast<PayloadData*>(payload);
-        qDebug().noquote() << "old_start" << hunk->old_start << hunk->old_lines
-                           << "new_start" << hunk->new_start << hunk->new_lines;
+		aw::trace::log("hunk: old %d..%d", hunk->old_start, hunk->old_start + hunk->old_lines-1);
+		aw::trace::log("hunk: new %d..%d", hunk->new_start, hunk->new_start + hunk->new_lines-1);
 
         if ( hunk->old_start > data->left_start )
         {
-            for(int i = data->left_start; i <= hunk->old_start; i++)
+			const int begin = data->left_start;
+			const int end = hunk->old_start;
+			aw::trace::log("hunk: add old lines %d..%d", begin, end-1);
+			for(int i = begin; i < end; i++)
             {
-                data->append(data->left[i-1], Qt::transparent);
+				data->append(data->oldLine(i), Qt::transparent);
             }
         }
 
@@ -109,22 +116,30 @@ namespace
 
     int line_cb(const git_diff_delta *delta, const git_diff_hunk *hunk, const git_diff_line *line, void *payload)
     {
+		const aw::trace fn("line_cb");
         const auto data = reinterpret_cast<PayloadData*>(payload);
+		const std::string origin { line->origin };
+		aw::trace::log("origin [%s]", origin.c_str());
+		aw::trace::log("old_lineno %d", line->old_lineno);
+		aw::trace::log("new_lineno %d", line->new_lineno);
+		aw::trace::log("num_lines %d", line->num_lines);
 
-        if ( line->old_lineno == -1 )
-        {
-            data->append(data->right[line->new_lineno-1], data->addedColor);
-        }
-        else if ( line->new_lineno == -1 )
-        {
-            data->append(data->left[line->old_lineno-1], data->removedColor);
-        }
-        else
-        {
-            data->append(data->left[line->old_lineno-1], Qt::transparent);
-        }
+		switch( line->origin )
+		{
+		case GIT_DIFF_LINE_ADDITION:
+			data->append(data->newLine(line->new_lineno), GitDiffLine::addedColor());
+			break;
+		case GIT_DIFF_LINE_DELETION:
+			data->append(data->oldLine(line->old_lineno), GitDiffLine::removedColor());
+			break;
+		case GIT_DIFF_LINE_CONTEXT:
+			data->append(data->oldLine(line->old_lineno), Qt::transparent);
+			break;
+		default:
+			break;
+		}
 
-        return 0;
+		return 0;
     }
 
 } // namespace
@@ -167,7 +182,7 @@ QVariant GitDiffModel::data(const QModelIndex &index, int role) const
         return QVariant{};
     }
 
-    const LineInfo &line = m_items[index.row()];
+	const auto &line = m_items[index.row()];
 
     switch (role)
     {
@@ -202,7 +217,7 @@ void GitDiffModel::loadFromFile(const QString &path)
     {
         while ( !file.atEnd() )
         {
-            LineInfo line;
+			GitDiffLine line;
             line.lineNumber = ++lineNumber;
             line.lineText = file.readLine();
             if ( line.lineText.endsWith(QChar{'\n'}) )
@@ -240,7 +255,7 @@ void GitDiffModel::setContent(const QByteArray &data)
     {
         while ( !file.atEnd() )
         {
-            LineInfo line;
+			GitDiffLine line;
             line.lineNumber = ++lineNumber;
             line.lineText = file.readLine();
             if ( line.lineText.endsWith(QChar{'\n'}) )
@@ -286,7 +301,7 @@ void GitDiffModel::addLine(const QString &text, QColor color)
 {
     beginInsertRows({}, m_items.size(), m_items.size());
 
-    LineInfo line;
+	GitDiffLine line;
     line.lineNumber = m_items.size() + 1;
     line.lineText = text;
     if ( line.lineText.endsWith(QChar{'\n'}) )
@@ -302,45 +317,45 @@ void GitDiffModel::setDiffBuffers(const QByteArray &left, const QByteArray &righ
     beginResetModel();
     m_items.clear();
 
-    PayloadData payload {
-        &m_items,
-        splitLines(left),
-        splitLines(right),
-        addedColor(),
-        removedColor(),
-        1, // left_start,
-        1 // right_start
-    };
+	PayloadData payload { left, right };
 
-    const auto ret = git_diff_buffers(left.constData(), left.size(), nullptr,
-                                      right.constData(), right.size(), nullptr,
+	aw::trace::log("old lines %d", payload.oldLines());
+	aw::trace::log("new lines %d", payload.newLines());
+
+	const auto ret = git_diff_buffers(payload.oldContent.constData(), payload.oldContent.size(), nullptr,
+									  payload.newContent.constData(), payload.newContent.size(), nullptr,
                                       nullptr, nullptr, nullptr, &hunk_cb, &line_cb, &payload);
     if ( ret != 0 )
     {
 
     }
 
-    if ( ret == 0 )
-    {
+	if ( ret == 0 )
+	{
         if ( !left.isEmpty() )
         {
-
-            qDebug().noquote() << "rest: " << payload.left_start << "/" << payload.left.size();
-            for(int i = payload.left_start; i <= payload.left.size(); i++)
+			const int begin	= payload.left_start;
+			const int end = payload.oldLines() + 1;
+			aw::trace::log("rest(left) add old lines %d..%d", begin, end-1);
+			for(int i = begin; i < end; i++)
             {
-                payload.append(payload.left[i-1], Qt::transparent);
+				payload.append(payload.oldLine(i), Qt::transparent);
             }
         }
         else if ( !right.isEmpty() )
         {
-            qDebug().noquote() << "rest: " << payload.right_start << "/" << payload.right.size();
-            for(int i = payload.right_start; i <= payload.right.size(); i++)
+			qDebug().noquote() << "rest(right): " << payload.right_start << "/" << payload.oldLines();
+			const int begin	= payload.right_start;
+			const int end = payload.newLines() + 1;
+			aw::trace::log("rest(right) add new lines %d..%d", begin, end-1);
+			for(int i = begin; i < end; i++)
             {
-                payload.append(payload.right[i-1], Qt::transparent);
+				payload.append(payload.newLine(i), Qt::transparent);
             }
         }
 
-        m_text = joinLines(m_items);
+		m_items = payload.items;
+		m_text = joinLines(m_items);
     }
     else
     {

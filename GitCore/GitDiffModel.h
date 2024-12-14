@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GitRepository.h"
+#include "GitDiffLine.h"
 #include <QAbstractListModel>
 #include <QQmlEngine>
 #include <QColor>
@@ -24,13 +25,6 @@ class GitDiffModel: public QAbstractListModel
 
 public:
 
-    struct LineInfo
-    {
-        int lineNumber;
-        QString lineText;
-        QColor lineColor;
-    };
-
     enum Roles
     {
         LineTextRole = Qt::DisplayRole,
@@ -43,7 +37,7 @@ private:
     GitRepository *m_repo { nullptr };
     QString m_file_path { };
     QString m_file_source { };
-    QList<LineInfo> m_items;
+	QList<GitDiffLine> m_items;
     QString m_text { };
 
 public:
@@ -64,9 +58,6 @@ public:
 
     void loadFromFile(const QString &path);
     void setContent(const QByteArray &data);
-
-    static QColor addedColor() { return QColor{"aquamarine"}; }
-    static QColor removedColor() { return QColor{"crimson"}; }
 
     void setLineColor(int row, QColor color);
 
